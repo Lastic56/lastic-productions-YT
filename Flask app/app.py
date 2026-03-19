@@ -50,10 +50,27 @@ def analyze():
     if not url:
         return jsonify({'error': 'No URL provided'}), 400
 
-    ydl_opts = {'quiet': True, 'no_warnings': True}
+    ydl_opts = {
+        'quiet': True, 
+        'no_warnings': True,
+        'logger': YtdlpLogger(),
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        },
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'web'],
+                'player_skip': ['configs', 'webpage'],
+            }
+        },
+        'socket_timeout': 30,
+        'retries': 3
+    }
     try:
+        print(f"Analyzing URL: {url}")
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
+            print(f"Successfully extracted info for: {info.get('title', 'Unknown')}")
             
             valid_qualities = set()
             for f in info.get('formats', []):
@@ -71,6 +88,7 @@ def analyze():
                 'qualities': sorted_qualities
             })
     except Exception as e:
+        print(f"Error analyzing URL: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/download', methods=['POST'])
@@ -106,7 +124,38 @@ def run_download(url, quality, audio_format, bitrate):
         'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
         'quiet': True,
         'no_warnings': True,
-        'logger': YtdlpLogger()
+        'logger': YtdlpLogger(),
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'video',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+        },
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'ios', 'web'],
+                'player_skip': ['configs', 'webpage', 'js'],
+                'po_token': ['android', 'ios'],
+            }
+        },
+        'extractor_retries': 5,
+        'fragment_retries': 10,
+        'retry_sleep_functions': {
+            'http': lambda x: min(x * 2, 60),
+            'fragment': lambda x: min(x * 2, 60),
+            'file_access': lambda x: min(x * 2, 30)
+        },
+        'file_access_retries': 10,
+        'nocheckcertificate': True,
+        'ignoreerrors': True,
+        'extract_flat': False,
     }
 
     if quality == 'Audio Only':
