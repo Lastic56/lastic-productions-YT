@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, send_file
 import os
 import threading
 import yt_dlp
@@ -115,13 +115,14 @@ def download():
     return jsonify({'message': 'Download started'})
 
 def run_download(url, quality, audio_format, bitrate):
-    download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-    if not os.path.exists(download_dir):
-        os.makedirs(download_dir)
+    # Unified local project storage for cloud hosting compatibility
+    local_download_dir = os.path.join(os.getcwd(), "downloads")
+    if not os.path.exists(local_download_dir):
+        os.makedirs(local_download_dir)
 
     ydl_opts = {
         'progress_hooks': [progress_hook],
-        'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
+        'outtmpl': os.path.join(local_download_dir, '%(title)s.%(ext)s'),
         'quiet': True,
         'no_warnings': True,
         'logger': YtdlpLogger(),
@@ -175,6 +176,7 @@ def run_download(url, quality, audio_format, bitrate):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             download_status['title'] = info.get('title', 'Video')
+            download_status['file_path'] = ydl.prepare_filename(info)
             download_status['status'] = "Completed"
             download_status['finished'] = True
     except Exception as e:
@@ -184,6 +186,13 @@ def run_download(url, quality, audio_format, bitrate):
 @app.route('/status')
 def status():
     return jsonify(download_status)
+
+@app.route('/get_file')
+def get_file():
+    path = download_status.get('file_path')
+    if path and os.path.exists(path):
+        return send_file(path, as_attachment=True)
+    return "Media file not found. Please try downloading again.", 404
 
 if __name__ == '__main__':
     # Get local IP
