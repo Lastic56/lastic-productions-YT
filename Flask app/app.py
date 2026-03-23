@@ -68,20 +68,31 @@ def analyze():
     }
     
     cookie_path = os.path.join(os.getcwd(), "cookies.txt")
+    found_type = "None"
+    if os.path.exists(cookie_path):
+        found_type = "Local Root"
     if not os.path.exists(cookie_path):
         secret_path = "/etc/secrets/cookies.txt"
         if os.path.exists(secret_path):
+            found_type = "Render Secrets"
             # Render secrets are read-only; copy to writable /tmp for yt-dlp
             try:
                 import shutil
                 cookie_path = "/tmp/cookies.txt"
                 shutil.copy2(secret_path, cookie_path)
+                found_type = "Render Secrets (Copied to /tmp)"
             except Exception as e:
                 print(f"Cookie copy failed: {e}")
                 cookie_path = secret_path
 
     if os.path.exists(cookie_path):
+        print(f"DEBUG: Found cookies at {found_type} -> {cookie_path}")
         ydl_opts['cookiefile'] = cookie_path
+        # When using cookies, we should definitely include 'web' client 
+        # as the cookies are browser-based
+        ydl_opts['extractor_args']['youtube']['player_client'] = ['web', 'android', 'ios']
+    else:
+        print("DEBUG: No cookies.txt found in any location.")
 
     try:
         print(f"Analyzing URL: {url}")
@@ -189,6 +200,8 @@ def run_download(url, quality, audio_format, bitrate):
 
     if os.path.exists(cookie_path):
         ydl_opts['cookiefile'] = cookie_path
+        # Enable web client when cookies are available for better compatibility
+        ydl_opts['extractor_args']['youtube']['player_client'] = ['web', 'android', 'ios']
 
     if quality == 'Audio Only':
         ydl_opts['format'] = 'bestaudio/best'
