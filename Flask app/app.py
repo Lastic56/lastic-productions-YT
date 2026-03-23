@@ -50,49 +50,43 @@ def analyze():
     if not url:
         return jsonify({'error': 'No URL provided'}), 400
 
-    ydl_opts = {
-        'quiet': True, 
-        'no_warnings': True,
-        'logger': YtdlpLogger(),
-        'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        },
-        'extractor_args': {
-            'youtube': {
-                'player_client': ['android', 'ios'],
-                'player_skip': ['configs', 'webpage'],
-            }
-        },
-        'socket_timeout': 30,
-        'retries': 3
-    }
-    
     cookie_path = os.path.join(os.getcwd(), "cookies.txt")
     found_type = "None"
     if os.path.exists(cookie_path):
         found_type = "Local Root"
-    if not os.path.exists(cookie_path):
+    else:
         secret_path = "/etc/secrets/cookies.txt"
         if os.path.exists(secret_path):
             found_type = "Render Secrets"
-            # Render secrets are read-only; copy to writable /tmp for yt-dlp
             try:
                 import shutil
-                cookie_path = "/tmp/cookies.txt"
+                cookie_path = "/tmp/cookies_analyze.txt"
                 shutil.copy2(secret_path, cookie_path)
                 found_type = "Render Secrets (Copied to /tmp)"
             except Exception as e:
                 print(f"Cookie copy failed: {e}")
                 cookie_path = secret_path
 
+    # Build options with explicit cookie logic
+    ydl_opts = {
+        'quiet': True,
+        'no_warnings': True,
+        'logger': YtdlpLogger(),
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['web', 'android', 'ios'] if os.path.exists(cookie_path) else ['android', 'ios'],
+                'player_skip': ['configs', 'webpage'],
+            }
+        },
+        'socket_timeout': 30,
+        'retries': 3
+    }
+
     if os.path.exists(cookie_path):
-        print(f"DEBUG: Found cookies at {found_type} -> {cookie_path}")
+        print(f"DEBUGGING: Using cookies from {found_type} at {cookie_path}")
         ydl_opts['cookiefile'] = cookie_path
-        # When using cookies, we should definitely include 'web' client 
-        # as the cookies are browser-based
-        ydl_opts['extractor_args']['youtube']['player_client'] = ['web', 'android', 'ios']
     else:
-        print("DEBUG: No cookies.txt found in any location.")
+        print(f"DEBUGGING: Starting WITHOUT cookies (Tried Root and Secrets)")
 
     try:
         print(f"Analyzing URL: {url}")
@@ -148,28 +142,31 @@ def run_download(url, quality, audio_format, bitrate):
     if not os.path.exists(local_download_dir):
         os.makedirs(local_download_dir)
 
+    cookie_path = os.path.join(os.getcwd(), "cookies.txt")
+    found_type = "None"
+    if os.path.exists(cookie_path):
+        found_type = "Local Root"
+    else:
+        secret_path = "/etc/secrets/cookies.txt"
+        if os.path.exists(secret_path):
+            found_type = "Render Secrets"
+            try:
+                import shutil
+                cookie_path = "/tmp/cookies_download.txt"
+                shutil.copy2(secret_path, cookie_path)
+                found_type = "Render Secrets (Copied to /tmp)"
+            except:
+                cookie_path = secret_path
+
     ydl_opts = {
         'progress_hooks': [progress_hook],
         'outtmpl': os.path.join(local_download_dir, '%(title)s.%(ext)s'),
         'quiet': True,
         'no_warnings': True,
         'logger': YtdlpLogger(),
-        'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate',
-            'DNT': '1',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'Sec-Fetch-Dest': 'video',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-User': '?1',
-        },
         'extractor_args': {
             'youtube': {
-                'player_client': ['android', 'ios'],
+                'player_client': ['web', 'android', 'ios'] if os.path.exists(cookie_path) else ['android', 'ios'],
                 'player_skip': ['configs', 'webpage', 'js'],
                 'po_token': ['android', 'ios'],
             }
@@ -187,21 +184,11 @@ def run_download(url, quality, audio_format, bitrate):
         'extract_flat': False,
     }
 
-    cookie_path = os.path.join(os.getcwd(), "cookies.txt")
-    if not os.path.exists(cookie_path):
-        secret_path = "/etc/secrets/cookies.txt"
-        if os.path.exists(secret_path):
-            try:
-                import shutil
-                cookie_path = "/tmp/cookies_dl.txt"
-                shutil.copy2(secret_path, cookie_path)
-            except:
-                cookie_path = secret_path
-
     if os.path.exists(cookie_path):
+        print(f"DEBUGGING DOWNLOAD: Using cookies from {found_type} at {cookie_path}")
         ydl_opts['cookiefile'] = cookie_path
-        # Enable web client when cookies are available for better compatibility
-        ydl_opts['extractor_args']['youtube']['player_client'] = ['web', 'android', 'ios']
+    else:
+        print(f"DEBUGGING DOWNLOAD: No cookies found.")
 
     if quality == 'Audio Only':
         ydl_opts['format'] = 'bestaudio/best'
