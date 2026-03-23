@@ -59,7 +59,7 @@ def analyze():
         },
         'extractor_args': {
             'youtube': {
-                'player_client': ['android', 'web'],
+                'player_client': ['android', 'ios'],
                 'player_skip': ['configs', 'webpage'],
             }
         },
@@ -141,7 +141,7 @@ def run_download(url, quality, audio_format, bitrate):
         },
         'extractor_args': {
             'youtube': {
-                'player_client': ['android', 'ios', 'web'],
+                'player_client': ['android', 'ios'],
                 'player_skip': ['configs', 'webpage', 'js'],
                 'po_token': ['android', 'ios'],
             }
