@@ -66,6 +66,13 @@ def analyze():
         'socket_timeout': 30,
         'retries': 3
     }
+    
+    cookie_path = os.path.join(os.getcwd(), "cookies.txt")
+    if not os.path.exists(cookie_path):
+        cookie_path = "/etc/secrets/cookies.txt"
+    if os.path.exists(cookie_path):
+        ydl_opts['cookiefile'] = cookie_path
+
     try:
         print(f"Analyzing URL: {url}")
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -158,6 +165,12 @@ def run_download(url, quality, audio_format, bitrate):
         'ignoreerrors': True,
         'extract_flat': False,
     }
+
+    cookie_path = os.path.join(os.getcwd(), "cookies.txt")
+    if not os.path.exists(cookie_path):
+        cookie_path = "/etc/secrets/cookies.txt"
+    if os.path.exists(cookie_path):
+        ydl_opts['cookiefile'] = cookie_path
 
     if quality == 'Audio Only':
         ydl_opts['format'] = 'bestaudio/best'
