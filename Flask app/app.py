@@ -69,7 +69,17 @@ def analyze():
     
     cookie_path = os.path.join(os.getcwd(), "cookies.txt")
     if not os.path.exists(cookie_path):
-        cookie_path = "/etc/secrets/cookies.txt"
+        secret_path = "/etc/secrets/cookies.txt"
+        if os.path.exists(secret_path):
+            # Render secrets are read-only; copy to writable /tmp for yt-dlp
+            try:
+                import shutil
+                cookie_path = "/tmp/cookies.txt"
+                shutil.copy2(secret_path, cookie_path)
+            except Exception as e:
+                print(f"Cookie copy failed: {e}")
+                cookie_path = secret_path
+
     if os.path.exists(cookie_path):
         ydl_opts['cookiefile'] = cookie_path
 
@@ -168,7 +178,15 @@ def run_download(url, quality, audio_format, bitrate):
 
     cookie_path = os.path.join(os.getcwd(), "cookies.txt")
     if not os.path.exists(cookie_path):
-        cookie_path = "/etc/secrets/cookies.txt"
+        secret_path = "/etc/secrets/cookies.txt"
+        if os.path.exists(secret_path):
+            try:
+                import shutil
+                cookie_path = "/tmp/cookies_dl.txt"
+                shutil.copy2(secret_path, cookie_path)
+            except:
+                cookie_path = secret_path
+
     if os.path.exists(cookie_path):
         ydl_opts['cookiefile'] = cookie_path
 
