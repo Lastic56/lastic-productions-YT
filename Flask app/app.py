@@ -68,18 +68,25 @@ def analyze():
                 cookie_path = secret_path
 
     # Build options with explicit cookie logic
+    has_cookies = os.path.exists(cookie_path)
     ydl_opts = {
         'quiet': True,
         'no_warnings': True,
         'logger': YtdlpLogger(),
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Sec-Fetch-Mode': 'navigate',
+        },
         'extractor_args': {
             'youtube': {
-                'player_client': ['web', 'android', 'ios'] if os.path.exists(cookie_path) else ['android', 'ios'],
+                'player_client': ['web', 'android', 'ios'] if has_cookies else ['android', 'ios'],
                 'player_skip': ['configs', 'webpage'],
             }
         },
         'socket_timeout': 30,
-        'retries': 3
+        'retries': 5
     }
 
     if os.path.exists(cookie_path):
