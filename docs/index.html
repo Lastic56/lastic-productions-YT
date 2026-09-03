@@ -4,32 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STUDIO CYBER · LASTIC PRODUCTIONS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
             --bg-body: #09090b;
             --bg-card: rgba(24, 24, 27, 0.6);
+            --card-bg: #181818;
+            --input-bg: #202020;
             --text-primary: #fafafa;
             --text-secondary: #a1a1aa;
             --border-color: rgba(255, 255, 255, 0.08);
+            --accent-blue: #38bdf8;
+            --accent-purple: #818cf8;
             --accent-primary: #38bdf8;
             --accent-secondary: #818cf8;
             --gradient-main: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
             --success: #10b981;
             --danger: #ef4444;
+            --radius: 12px;
             --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-display: 'Orbitron', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg-body); color: var(--text-primary); font-family: var(--font-sans); height: 100vh; overflow: hidden; }
+        body { background-color: var(--bg-body); color: var(--text-primary); font-family: var(--font-sans); min-height: 100vh; overflow-x: hidden; }
         .matrix-rain { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; opacity: 0.15; pointer-events: none; }
         header { position: fixed; top: 0; left: 0; width: 100%; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); }
         .logo { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 24px; font-weight: 700; }
         .logo-icon { width: 32px; height: 32px; background: var(--gradient-main); border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(56,189,248,0.4); }
         .logo-text { background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .header-links { display: flex; gap: 24px; }
-        .header-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .header-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; transition: color 0.2s; cursor: pointer; }
         .header-links a:hover { color: var(--accent-primary); }
         .hero { position: relative; min-height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; padding: 80px 32px 0; z-index: 1; }
         .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 50%, rgba(56, 189, 248, 0.1), transparent 50%); z-index: 0; }
@@ -39,13 +44,6 @@
         .hero-content p { font-size: 1.1rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; }
         .launch-btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; border: none; padding: 16px 48px; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease; font-family: var(--font-display); background: var(--gradient-main); color: #000; box-shadow: 0 0 30px rgba(56,189,248,0.4); animation: pulse 2s infinite; }
         .launch-btn:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(56,189,248,0.6); animation: none; }
-        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 60px; padding: 0 20px; }
-        .feature-card { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s ease; cursor: pointer; }
-        .feature-card:hover { transform: translateY(-4px); border-color: rgba(56,189,248,0.4); }
-        .feature-card i { font-size: 28px; color: var(--accent-primary); margin-bottom: 12px; }
-        .feature-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
-        .feature-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-        .feature-card .hint { margin-top: 12px; font-size: 12px; color: var(--accent-primary); }
         .status-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: rgba(255,255,255,0.1); font-size: 12px; font-weight: 600; color: var(--success); margin-bottom: 20px; }
         .status-badge.building { color: var(--danger); }
         .status-badge.building::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; }
@@ -54,14 +52,89 @@
         .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 12px; }
         .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 13px; }
         .footer-links a:hover { color: var(--accent-primary); }
+        .dots-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.3; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* ---- APP MODE ---- */
+        .app-wrap { display: none; position: relative; z-index: 1; min-height: 100vh; padding: 100px 20px 40px; }
+        .app-wrap.active { display: flex; justify-content: center; }
+        .hero-wrap.hidden, .hidden { display: none !important; }
+        .app-container { width: 100%; max-width: 540px; }
+        .app-header { text-align: center; margin-bottom: 30px; }
+        .app-header h1 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; background: var(--gradient-main); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }
+        .app-header p { color: var(--text-secondary); font-size: 0.9rem; }
+        .input-section { margin-bottom: 20px; }
+        .input-group, .profile-input-group { display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; background: var(--input-bg); border: 1px solid #333; border-radius: var(--radius); padding: 12px 16px; color: white; font-size: 1rem; transition: border-color 0.2s; font-family: var(--font-sans); }
+        input[type="text"]:focus { outline: none; border-color: var(--accent-primary); }
+        button { cursor: pointer; border: none; border-radius: var(--radius); font-weight: 600; transition: filter 0.2s, transform 0.1s; font-family: var(--font-sans); }
+        button:active { transform: scale(0.98); }
+        .action-btn { background: var(--accent-primary); color: white; padding: 0 15px; min-width: 100px; }
+        .preview-card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; animation: slideUp 0.3s ease-out; }
+        .preview-flex { display: flex; gap: 15px; margin-bottom: 20px; }
+        #thumbnail { width: 132px; height: 74px; object-fit: cover; border-radius: 6px; }
+        .video-info h3 { font-size: 1rem; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .settings { margin-bottom: 20px; }
+        .control-group { margin-bottom: 15px; }
+        .control-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; }
+        select { width: 100%; background: var(--input-bg); color: white; border: 1px solid #444; padding: 10px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-family: var(--font-sans); }
+        .action-buttons { display: flex; flex-direction: column; gap: 10px; }
+        .primary-btn { background: var(--success); color: black; padding: 14px; font-size: 1rem; letter-spacing: 0.5px; }
+        .secondary-btn { background: var(--accent-secondary); color: white; padding: 14px; font-size: 1rem; }
+        .progress-container { background: var(--card-bg); border-radius: var(--radius); padding: 15px; margin-bottom: 20px; }
+        .status-header { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; }
+        #speedEta { color: var(--text-secondary); }
+        .progress-bar-bg { background: #333; height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { background: var(--gradient-main); height: 100%; width: 0%; transition: width 0.3s ease-out; }
+        .log-section { background: #000; border: 1px solid #222; border-radius: var(--radius); padding: 15px; }
+        .log-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 700; color: #555; margin-bottom: 10px; }
+        #clearLog { background: none; color: #ff4d4d; font-size: 0.7rem; padding: 2px 8px; }
+        .log-content { height: 120px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; }
+        .log-entry { margin-bottom: 4px; }
+        .log-time { color: #555; }
+        .error { color: var(--danger); }
+        .success { color: var(--success); }
+        .tab-switcher { display: flex; background: var(--input-bg); padding: 4px; border-radius: 10px; margin-top: 20px; gap: 4px; }
+        .tab-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary); background: transparent; font-family: var(--font-display); }
+        .tab-btn.active { background: var(--card-bg); color: var(--text-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .profile-grid-container { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+        .profile-info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #itemsFoundCount { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
+        .download-all-btn { background: var(--success); color: black; padding: 8px 16px; font-size: 0.8rem; font-weight: 700; }
+        .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 5px; }
+        .media-grid::-webkit-scrollbar, .search-results-grid::-webkit-scrollbar, .log-content::-webkit-scrollbar { width: 4px; }
+        .media-grid::-webkit-scrollbar-thumb, .search-results-grid::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        .media-item { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #111; }
+        .media-item img { width: 100%; height: 100%; object-fit: cover; }
+        .media-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 5px; text-align: center; }
+        .media-overlay span { font-size: 0.6rem; font-weight: 700; color: white; }
+        .search-results-container { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; animation: slideUp 0.3s ease-out; }
+        .search-info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #searchResultsCount { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
+        .search-results-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
+        .search-result-card { display: flex; gap: 12px; background: #111; border-radius: 8px; padding: 10px; align-items: center; transition: background 0.2s; }
+        .search-result-card:hover { background: #1a1a1a; }
+        .search-result-thumb { width: 120px; height: 68px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+        .search-result-info { flex: 1; min-width: 0; }
+        .search-result-title { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+        .search-result-channel { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 2px; }
+        .search-result-meta { font-size: 0.7rem; color: #666; }
+        .search-download-btn { background: var(--success); color: black; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s; }
+        .search-download-btn:hover { transform: scale(1.1); }
+        .search-download-btn:active { transform: scale(0.95); }
+        .error-text { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--danger); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 20px; font-size: 0.9rem; }
+        #downloadReady a { text-decoration: none; color: #fff; display: inline-block; width: 100%; border-radius: 12px; font-weight: 700; padding: 14px; background: var(--success); text-align: center; margin-top: 20px; }
+        .mt-2 { margin-top: 8px; }
         @media (max-width: 768px) {
             .hero-content h1 { font-size: 2rem; }
             .launch-btn { padding: 14px 36px; font-size: 0.95rem; }
             header { padding: 12px 20px; }
             .hero { padding: 60px 12px 0; }
         }
-        .dots-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.3; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -79,14 +152,14 @@
             <span class="logo-text">STUDIO CYBER</span>
         </div>
         <nav class="header-links">
-            <a href="#features">Features</a>
-            <a href="#download">Download</a>
-            <a href="#support">Support</a>
+            <a id="exitAppLink" style="display:none;" onclick="exitApp()"><i class="fas fa-arrow-left"></i> Back</a>
+            <a href="#features" onclick="return true">Apps</a>
+            <a href="https://github.com/lasticproductions247-hub/lastic-productions-YT">GitHub</a>
         </nav>
     </header>
 
     <!-- Hero Section -->
-    <section class="hero" id="home">
+    <section class="hero hero-wrap" id="heroWrap">
         <div class="hero-content">
             <span class="status-badge building" id="buildStatus">APK BUILD IN PROGRESS</span>
             <h1>
@@ -98,47 +171,171 @@
                 Support for multiple quality formats, audio extraction (MP3/M4A/WAV), subtitles,
                 and bulk profile scraping.
             </p>
-            <a href="javascript:void(0)" class="launch-btn" onclick="openDownloadModal()">
+            <button class="launch-btn" onclick="enterApp()">
                 <i class="fas fa-rocket"></i>
                 LAUNCH APP
-            </a>
-
-            <div class="feature-grid" id="features">
-                <div class="feature-card" onclick="openDownloadModal()">
-                    <i>🎥</i>
-                    <h3>YouTube & Social</h3>
-                    <p>Download from all major platforms</p>
-                    <div class="hint">Click to download →</div>
-                </div>
-                <div class="feature-card">
-                    <i>🎵</i>
-                    <h3>Audio Extraction</h3>
-                    <p>Convert to MP3/M4A/WAV</p>
-                </div>
-                <div class="feature-card">
-                    <i>📦</i>
-                    <h3>Bulk Scraping</h3>
-                    <p>Profile archive downloads</p>
-                </div>
-                <div class="feature-card">
-                    <i>📱</i>
-                    <h3>APK App</h3>
-                    <p>Android build in progress</p>
-                </div>
-            </div>
+            </button>
         </div>
 
         <footer id="support">
             <div class="footer-links">
-                <a href="https://github.com/kinkysweetfeet90-ship-it/lastic-productions-YT">GitHub</a>
-                <a href="https://github.com/kinkysweetfeet90-ship-it/lastic-productions-YT/releases">Releases</a>
-                <a href="https://github.com/kinkysweetfeet90-ship-it/lastic-productions-YT/actions">Build Status</a>
+                <a href="https://github.com/lasticproductions247-hub/lastic-productions-YT">GitHub</a>
+                <a href="https://github.com/lasticproductions247-hub/lastic-productions-YT/releases">Releases</a>
+                <a href="https://github.com/lasticproductions247-hub/lastic-productions-YT/actions">Build Status</a>
             </div>
             <p>STUDIO CYBER · LASTIC PRODUCTIONS · 2026</p>
         </footer>
     </section>
 
+    <!-- App Mode -->
+    <div class="app-wrap" id="appWrap">
+        <div class="app-container">
+            <header class="app-header">
+                <h1>LASTIC PRODUCTIONS</h1>
+                <p>Premium Media Toolset</p>
+                <div class="tab-switcher">
+                    <button class="tab-btn active" data-tab="singleTab">SINGLE LINK</button>
+                    <button class="tab-btn" data-tab="searchTab">SEARCH</button>
+                    <button class="tab-btn" data-tab="profileTab">PROFILE SCRAPER</button>
+                </div>
+            </header>
+
+            <main class="content">
+                <!-- Single Link Tab -->
+                <div id="singleTab" class="tab-content active">
+                    <section class="input-section">
+                        <div class="input-group">
+                            <input type="text" id="videoUrl" placeholder="Paste YouTube/Social link here..." autocomplete="off">
+                            <button id="analyzeBtn" class="action-btn">ANALYZE</button>
+                        </div>
+                    </section>
+
+                    <section id="previewSection" class="preview-card hidden">
+                        <div class="preview-flex">
+                            <img id="thumbnail" src="" alt="Thumbnail">
+                            <div class="video-info">
+                                <h3 id="videoTitle"></h3>
+                            </div>
+                        </div>
+                        <div class="settings">
+                            <div class="control-group">
+                                <label>Video Quality:</label>
+                                <select id="qualitySelect"></select>
+                            </div>
+                            <div id="playlistInfo" class="control-group hidden">
+                                <label style="color: var(--accent-primary);">📁 Playlist detected - <span id="videoCount">0</span> videos</label>
+                            </div>
+                            <div class="control-group">
+                                <label>
+                                    <input type="checkbox" id="subtitleToggle" style="accent-color: var(--success);"> Download Subtitles
+                                </label>
+                                <div id="subtitleSettings" class="hidden" style="margin-top: 8px;">
+                                    <label>Language:</label>
+                                    <select id="subLangSelect">
+                                        <option value="en">English</option>
+                                        <option value="es">Spanish</option>
+                                        <option value="fr">French</option>
+                                        <option value="de">German</option>
+                                        <option value="ja">Japanese</option>
+                                        <option value="ko">Korean</option>
+                                        <option value="zh">Chinese</option>
+                                        <option value="ru">Russian</option>
+                                        <option value="pt">Portuguese</option>
+                                        <option value="ar">Arabic</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="audioSettings" class="control-group hidden">
+                                <label>Format:</label>
+                                <select id="formatSelect">
+                                    <option value="mp3">MP3</option>
+                                    <option value="m4a">M4A</option>
+                                    <option value="wav">WAV</option>
+                                </select>
+                                <label class="mt-2">Bitrate:</label>
+                                <select id="bitrateSelect">
+                                    <option value="320">320kbps</option>
+                                    <option value="256">256kbps</option>
+                                    <option value="192">192kbps</option>
+                                    <option value="128">128kbps</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="downloadBtn" class="primary-btn">DOWNLOAD VIDEO</button>
+                            <button id="quickMp3Btn" class="secondary-btn">QUICK MP3</button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Search Tab -->
+                <div id="searchTab" class="tab-content">
+                    <section class="input-section">
+                        <div class="input-group">
+                            <input type="text" id="searchQuery" placeholder="Search YouTube videos..." autocomplete="off">
+                            <button id="searchBtn" class="action-btn">SEARCH</button>
+                        </div>
+                    </section>
+
+                    <section id="searchResults" class="search-results-container hidden">
+                        <div class="search-info-header">
+                            <span id="searchResultsCount">0 results</span>
+                        </div>
+                        <div id="searchResultsGrid" class="search-results-grid"></div>
+                    </section>
+                </div>
+
+                <!-- Profile Scraper Tab -->
+                <div id="profileTab" class="tab-content">
+                    <section class="input-section">
+                        <div class="profile-input-group">
+                            <input type="text" id="profileUrl" placeholder="Paste Profile URL (Twitter, Instagram, etc)..." autocomplete="off">
+                            <button id="scrapeProfileBtn" class="action-btn">SCRAPE PROFILE</button>
+                        </div>
+                    </section>
+
+                    <section id="profilePreview" class="profile-grid-container hidden">
+                        <div class="profile-info-header">
+                            <span id="itemsFoundCount">0 items found</span>
+                            <button id="downloadAllProfileBtn" class="download-all-btn">DOWNLOAD ALL</button>
+                        </div>
+                        <div id="profileMediaGrid" class="media-grid"></div>
+                    </section>
+                </div>
+
+                <div id="errorMessage" class="error-text hidden"></div>
+
+                <!-- Progress Section -->
+                <section id="progressSection" class="progress-container hidden">
+                    <div class="status-header">
+                        <span id="statusLabel">READY</span>
+                        <span id="speedEta"></span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="progressBar" class="progress-bar-fill"></div>
+                    </div>
+                    <div id="downloadReady" class="hidden">
+                        <a href="" target="_blank">💾 SAVE TO DEVICE</a>
+                    </div>
+                </section>
+
+                <!-- Log Section -->
+                <section class="log-section">
+                    <div class="log-header">
+                        <span>SYSTEM LOG</span>
+                        <button id="clearLog">CLEAR</button>
+                    </div>
+                    <div id="statusLog" class="log-content">
+                        <p class="log-entry">System ready...</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
     <script>
+        const API_URL = "https://lastic-downloader-backend.onrender.com";
+
         // Matrix rain animation
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
@@ -194,7 +391,7 @@
         // Check build status
         async function checkBuildStatus() {
             try {
-                const res = await fetch('https://api.github.com/repos/kinkysweetfeet90-ship-it/lastic-productions-YT/actions/runs?per_page=3');
+                const res = await fetch('https://api.github.com/repos/lasticproductions247-hub/lastic-productions-YT/actions/runs?per_page=3');
                 const data = await res.json();
                 const latest = data.workflow_runs?.[0];
                 if (latest) {
@@ -213,137 +410,362 @@
         }
 
         checkBuildStatus();
-        setInterval(checkBuildStatus, 60000); // Check every minute
+        setInterval(checkBuildStatus, 60000);
 
-        // Smart download logic
-        const API_URL = "https://lastic-productions.onrender.com";
-
-        async function openDownloadModal() {
-            const platforms = [
-                { name: "YouTube", icon: "youtube", color: "#FF0000" },
-                { name: "Twitter/X", icon: "twitter", color: "#1DA1F2" },
-                { name: "Instagram", icon: "instagram", color: "#E4405F" },
-                { name: "TikTok", icon: "tiktok", color: "#FEAF1A" },
-                { name: "Facebook", icon: "facebook", color: "#1877F2" },
-                { name: "Reddit", icon: "reddit", color: "#FF4500" },
-                { name: "Twitch", icon: "twitch", color: "#9146FF" },
-                { name: "SoundCloud", icon: "soundcloud", color: "#FF5500" }
-            ];
-
-            let cards = '';
-            platforms.forEach(p => {
-                cards += `<div class="platform-card" style="border: 1px solid ${p.color}40; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 12px;">
-                    <div class="platform-icon" style="color: ${p.color}; font-size: 28px; margin-bottom: 8px;">
-                        <i class="fab fa-${p.icon}"></i>
-                    </div>
-                    <h3 style="font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">${p.name}</h3>
-                    <p style="font-size: 11px; color: var(--text-secondary);">Video + Audio + Subs</p>
-                </div>`;
-            });
-
-            const modal = document.createElement('div');
-            modal.className = 'download-modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 style="font-family: var(--font-display); font-size: 1.8rem;">Download From</h2>
-                        <span class="close-modal" onclick="closeDownloadModal()" style="cursor: pointer; font-size: 28px; color: var(--text-secondary);">&times;</span>
-                    </div>
-                    <div class="platform-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px;">
-                        ${cards}
-                    </div>
-                    <div class="download-form-section">
-                        <input type="url" id="videoUrl" class="download-input" placeholder="Paste video/podcast URL here..." style="width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-size: 15px; outline: none;" />
-                        <button id="fetchBtn" class="download-submit" style="width: 100%; padding: 14px; background: var(--gradient-main); border: none; border-radius: 12px; color: #000; font-weight: 700; cursor: pointer; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px;" onclick="fetchVideoDetails()">
-                            <i class="fas fa-download"></i> FETCH DETAILS
-                        </button>
-                        <div id="resultSection" style="display: none; margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 12px;"></div>
-                    </div>
-                    <div class="app-downloads" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Or get the full desktop app:</p>
-                        <div class="app-downloads-grid" style="display: flex; gap: 12px;">
-                            <a href="https://github.com/kinkysweetfeet90-ship-it/lastic-productions-YT/releases/latest" class="app-download-btn" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px; border-radius: 8px; text-align: center; text-decoration: none; font-size: 13px;">
-                                <i class="fab fa-github"></i> GitHub Releases
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+        // Enter / exit full app
+        function enterApp() {
+            document.getElementById('heroWrap').classList.add('hidden');
+            document.getElementById('appWrap').classList.add('active');
+            document.getElementById('exitAppLink').style.display = '';
+            addLog('Full workspace loaded.');
         }
 
-        function closeDownloadModal() {
-            const modal = document.querySelector('.download-modal');
-            if (modal) modal.remove();
+        function exitApp() {
+            document.getElementById('appWrap').classList.remove('active');
+            document.getElementById('heroWrap').classList.remove('hidden');
+            document.getElementById('exitAppLink').style.display = 'none';
         }
 
-        async function fetchVideoDetails() {
-            const url = document.getElementById('videoUrl').value.trim();
-            if (!url) {
-                alert('Please paste a URL first.');
-                return;
-            }
+        // Tab Switching Logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+                addLog(`Switched to: ${btn.textContent}`);
+            };
+        });
 
-            const btn = document.getElementById('fetchBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> FETCHING...';
-            btn.disabled = true;
+        const elements = {
+            videoUrl: document.getElementById('videoUrl'),
+            analyzeBtn: document.getElementById('analyzeBtn'),
+            previewSection: document.getElementById('previewSection'),
+            thumbnail: document.getElementById('thumbnail'),
+            videoTitle: document.getElementById('videoTitle'),
+            qualitySelect: document.getElementById('qualitySelect'),
+            playlistInfo: document.getElementById('playlistInfo'),
+            videoCount: document.getElementById('videoCount'),
+            subtitleToggle: document.getElementById('subtitleToggle'),
+            subtitleSettings: document.getElementById('subtitleSettings'),
+            subLangSelect: document.getElementById('subLangSelect'),
+            audioSettings: document.getElementById('audioSettings'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            quickMp3Btn: document.getElementById('quickMp3Btn'),
+
+            profileUrl: document.getElementById('profileUrl'),
+            scrapeProfileBtn: document.getElementById('scrapeProfileBtn'),
+            profilePreview: document.getElementById('profilePreview'),
+            itemsFoundCount: document.getElementById('itemsFoundCount'),
+            profileMediaGrid: document.getElementById('profileMediaGrid'),
+            downloadAllProfileBtn: document.getElementById('downloadAllProfileBtn'),
+
+            searchQuery: document.getElementById('searchQuery'),
+            searchBtn: document.getElementById('searchBtn'),
+            searchResults: document.getElementById('searchResults'),
+            searchResultsCount: document.getElementById('searchResultsCount'),
+            searchResultsGrid: document.getElementById('searchResultsGrid'),
+
+            progressSection: document.getElementById('progressSection'),
+            statusLabel: document.getElementById('statusLabel'),
+            speedEta: document.getElementById('speedEta'),
+            progressBar: document.getElementById('progressBar'),
+            statusLog: document.getElementById('statusLog'),
+            clearLog: document.getElementById('clearLog'),
+            errorMessage: document.getElementById('errorMessage'),
+            downloadReady: document.getElementById('downloadReady')
+        };
+
+        function addLog(msg, type = 'info') {
+            const entry = document.createElement('p');
+            entry.className = `log-entry ${type}`;
+            const time = new Date().toLocaleTimeString([], { hour12: false });
+            entry.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
+            elements.statusLog.appendChild(entry);
+            elements.statusLog.scrollTop = elements.statusLog.scrollHeight;
+        }
+
+        // --- SINGLE LINK LOGIC ---
+        elements.analyzeBtn.onclick = async () => {
+            const url = elements.videoUrl.value.trim();
+            if(!url) return;
+
+            elements.analyzeBtn.disabled = true;
+            elements.analyzeBtn.textContent = '...';
+            elements.errorMessage.classList.add('hidden');
+            addLog(`Analyzing URL: ${url.substring(0, 50)}...`);
 
             try {
-                const res = await fetch(`${API_URL}/info`, {
+                const res = await fetch(`${API_URL}/analyze`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url})
                 });
-
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
-                showVideoDetails(data, url);
-            } catch(e) {
-                alert('Fetch failed: ' + e.message + '\n\nUse the desktop app for reliable downloads.');
+
+                if(data.error) throw new Error(data.error);
+
+                elements.thumbnail.src = data.thumbnail;
+                elements.videoTitle.textContent = data.title;
+                elements.qualitySelect.innerHTML = data.qualities.map(q => `<option value="${q}">${q}</option>`).join('');
+
+                if(data.is_playlist) {
+                    elements.playlistInfo.classList.remove('hidden');
+                    elements.videoCount.textContent = data.video_count;
+                    elements.downloadBtn.textContent = 'DOWNLOAD PLAYLIST';
+                } else {
+                    elements.playlistInfo.classList.add('hidden');
+                    elements.downloadBtn.textContent = 'DOWNLOAD VIDEO';
+                }
+
+                elements.previewSection.classList.remove('hidden');
+                addLog(`Analyzed: ${data.title}`);
+            } catch (err) {
+                elements.errorMessage.textContent = err.message;
+                elements.errorMessage.classList.remove('hidden');
+                addLog(`Analysis failed: ${err.message}`, 'error');
             } finally {
-                btn.innerHTML = '<i class="fas fa-download"></i> FETCH DETAILS';
-                btn.disabled = false;
+                elements.analyzeBtn.disabled = false;
+                elements.analyzeBtn.textContent = 'ANALYZE';
             }
-        }
+        };
 
-        function showVideoDetails(data, url) {
-            const section = document.getElementById('resultSection');
-            section.style.display = 'block';
+        elements.qualitySelect.onchange = () => {
+            if(elements.qualitySelect.value === 'Audio Only') {
+                elements.audioSettings.classList.remove('hidden');
+            } else {
+                elements.audioSettings.classList.add('hidden');
+            }
+        };
 
-            let html = `<div class="video-preview" style="display: flex; gap: 12px; align-items: flex-start;">
-                <img src="${data.thumbnail || 'https://via.placeholder.com/120x90?text=No+Thumbnail'}" alt="Thumbnail" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" />
-                <div class="video-info" style="flex: 1; min-width: 0;">
-                    <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">${data.title || 'Unknown Title'}</h4>
-                    <div class="meta" style="font-size: 11px; color: var(--text-secondary); line-height: 1.6;">
-                        <div>• Duration: ${data.duration || 'N/A'}</div>
-                        <div>• Platform: ${data.platform || 'Detected'}</div>
-                        ${data.uploader ? `<div>• Uploader: ${data.uploader}</div>` : ''}
-                    </div>
-                </div>
-            </div>`;
+        elements.subtitleToggle.onchange = () => {
+            if(elements.subtitleToggle.checked) {
+                elements.subtitleSettings.classList.remove('hidden');
+            } else {
+                elements.subtitleSettings.classList.add('hidden');
+            }
+        };
 
-            if (data.formats && data.formats.length > 0) {
-                html += '<select id="formatSelect" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 13px; margin-top: 12px;">';
-                data.formats.forEach(fmt => {
-                    const label = `${fmt.quality || fmt.ext} • ${fmt.ext} • ${fmt.type || 'video'}`;
-                    html += `<option value="${fmt.url || fmt.quality}">${label}</option>`;
+        // --- PROFILE SCRAPER LOGIC ---
+        elements.scrapeProfileBtn.onclick = async () => {
+            const url = elements.profileUrl.value.trim();
+            if(!url) return;
+
+            elements.scrapeProfileBtn.disabled = true;
+            elements.scrapeProfileBtn.textContent = 'SCRAPING...';
+            elements.profilePreview.classList.add('hidden');
+            elements.errorMessage.classList.add('hidden');
+            addLog(`Scraping profile: ${url.substring(0, 50)}...`);
+
+            try {
+                const res = await fetch(`${API_URL}/profile/analyze`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url})
                 });
-                html += '</select>';
+                const data = await res.json();
+
+                if(data.error) throw new Error(data.error);
+
+                elements.itemsFoundCount.textContent = `${data.items.length} items found`;
+                elements.profileMediaGrid.innerHTML = data.items.map(item => `
+                    <div class="media-item">
+                        <img src="${item.thumbnail}" loading="lazy">
+                        <div class="media-overlay">
+                            <span>${item.type.toUpperCase()}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                elements.profilePreview.classList.remove('hidden');
+                addLog(`Found ${data.items.length} media items on profile.`);
+            } catch (err) {
+                elements.errorMessage.textContent = err.message;
+                elements.errorMessage.classList.remove('hidden');
+                addLog(`Scrape failed: ${err.message}`, 'error');
+            } finally {
+                elements.scrapeProfileBtn.disabled = false;
+                elements.scrapeProfileBtn.textContent = 'SCRAPE PROFILE';
             }
+        };
 
-            html += `<button class="download-btn" style="width: 100%; padding: 12px; border: none; border-radius: 12px; background: var(--gradient-main); color: #000; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-top: 12px;" onclick="downloadFile('${encodeURIComponent(url)}')">
-                <i class="fas fa-download"></i> DOWNLOAD NOW
-            </button>`;
+        elements.downloadAllProfileBtn.onclick = async () => {
+             const url = elements.profileUrl.value.trim();
+             addLog(`Starting bulk download for profile...`);
+             elements.downloadAllProfileBtn.disabled = true;
 
-            section.innerHTML = html;
+             try {
+                const res = await fetch(`${API_URL}/profile/download`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url})
+                });
+                if(!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || `HTTP ${res.status}`);
+                }
+                pollStatus();
+             } catch (err) {
+                 addLog(`Bulk download failed: ${err.message}`, 'error');
+                 elements.downloadAllProfileBtn.disabled = false;
+             }
+        };
+
+        // --- SEARCH LOGIC ---
+        elements.searchBtn.onclick = async () => {
+            const query = elements.searchQuery.value.trim();
+            if(!query) return;
+
+            elements.searchBtn.disabled = true;
+            elements.searchBtn.textContent = '...';
+            elements.errorMessage.classList.add('hidden');
+            elements.searchResults.classList.add('hidden');
+            addLog(`Searching: ${query.substring(0, 50)}...`);
+
+            try {
+                const res = await fetch(`${API_URL}/search`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query, max_results: 12})
+                });
+                const data = await res.json();
+
+                if(data.error) throw new Error(data.error);
+
+                elements.searchResultsCount.textContent = `${data.results.length} results for "${data.query}"`;
+                elements.searchResultsGrid.innerHTML = data.results.map(item => `
+                    <div class="search-result-card" data-url="${item.url}">
+                        <img src="${item.thumbnail}" loading="lazy" class="search-result-thumb">
+                        <div class="search-result-info">
+                            <h4 class="search-result-title">${item.title}</h4>
+                            <p class="search-result-channel">${item.channel}</p>
+                            <p class="search-result-meta">${formatDuration(item.duration)} • ${formatViews(item.views)}</p>
+                        </div>
+                        <button class="search-download-btn" onclick="downloadFromSearch('${item.url.replace(/'/g, "\\'")}')">⬇</button>
+                    </div>
+                `).join('');
+
+                elements.searchResults.classList.remove('hidden');
+                addLog(`Found ${data.results.length} results.`);
+            } catch (err) {
+                elements.errorMessage.textContent = err.message;
+                elements.errorMessage.classList.remove('hidden');
+                addLog(`Search failed: ${err.message}`, 'error');
+            } finally {
+                elements.searchBtn.disabled = false;
+                elements.searchBtn.textContent = 'SEARCH';
+            }
+        };
+
+        function formatDuration(seconds) {
+            if(!seconds) return 'LIVE';
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        function downloadFile(encodedUrl) {
-            const fmt = document.getElementById('formatSelect');
-            const selected = fmt ? fmt.value : '';
-            const downloadUrl = `${API_URL}/download?url=${encodedUrl}${fmt ? '&format=' + encodeURIComponent(selected) : ''}`;
-            window.open(downloadUrl, '_blank');
+        function formatViews(views) {
+            if(!views) return '0 views';
+            if(views >= 1000000) return `${(views/1000000).toFixed(1)}M views`;
+            if(views >= 1000) return `${(views/1000).toFixed(1)}K views`;
+            return `${views} views`;
         }
+
+        async function downloadFromSearch(url) {
+            elements.videoUrl.value = url;
+            document.querySelector('[data-tab="singleTab"]').click();
+
+            setTimeout(async () => {
+                elements.analyzeBtn.click();
+            }, 300);
+        }
+
+        async function startDownload(config) {
+            const url = elements.videoUrl.value.trim() || elements.profileUrl.value.trim();
+            elements.downloadBtn.disabled = true;
+            elements.quickMp3Btn.disabled = true;
+            elements.downloadReady.classList.add('hidden');
+            elements.progressSection.classList.remove('hidden');
+            addLog(`Initializing download: ${config.quality}...`);
+
+            try {
+                const res = await fetch(`${API_URL}/download`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ url, ...config })
+                });
+                const data = await res.json();
+                if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+                pollStatus();
+            } catch (err) {
+                addLog(`Download failed: ${err.message}`, 'error');
+                elements.downloadBtn.disabled = false;
+                elements.quickMp3Btn.disabled = false;
+            }
+        }
+
+        elements.downloadBtn.onclick = () => {
+            startDownload({
+                quality: elements.qualitySelect.value,
+                audio_format: document.getElementById('formatSelect').value,
+                bitrate: document.getElementById('bitrateSelect').value,
+                download_subs: elements.subtitleToggle.checked,
+                sub_langs: elements.subLangSelect.value
+            });
+        };
+
+        elements.quickMp3Btn.onclick = () => {
+            startDownload({
+                quality: 'Audio Only',
+                audio_format: 'mp3',
+                bitrate: '320',
+                download_subs: false
+            });
+        };
+
+        let pollInterval;
+        function pollStatus() {
+            if(pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`${API_URL}/status`);
+                    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+
+                    elements.statusLabel.textContent = data.status;
+                    elements.progressBar.style.width = `${data.progress}%`;
+                    elements.speedEta.textContent = data.speed || '';
+
+                    if(data.finished || data.error) {
+                        clearInterval(pollInterval);
+                        elements.downloadBtn.disabled = false;
+                        elements.quickMp3Btn.disabled = false;
+                        elements.downloadAllProfileBtn.disabled = false;
+
+                        if(data.finished) {
+                            addLog(`Download complete!`, 'success');
+                            elements.statusLabel.textContent = "✔️ DOWNLOAD DONE";
+                            const ready = elements.downloadReady.querySelector('a');
+                            ready.href = `${API_URL}/get_file`;
+                            elements.downloadReady.classList.remove('hidden');
+                        } else {
+                            addLog(`Error: ${data.error}`, 'error');
+                        }
+                    }
+                } catch (err) {
+                    addLog(`Status check failed: ${err.message}`, 'error');
+                    clearInterval(pollInterval);
+                    elements.downloadBtn.disabled = false;
+                    elements.quickMp3Btn.disabled = false;
+                    elements.downloadAllProfileBtn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        elements.clearLog.onclick = () => {
+            elements.statusLog.innerHTML = '';
+            addLog('Log cleared.');
+        };
 
         console.log("%cSTUDIO CYBER · LASTIC PRODUCTIONS", "color:#38bdf8; font-family:monospace");
     </script>
