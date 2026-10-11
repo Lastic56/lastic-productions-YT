@@ -1,3 +1,4 @@
 Flask==3.1.1
 yt-dlp==2026.3.17
 gunicorn==26.0.0
+gallery-dl

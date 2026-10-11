@@ -35,6 +35,20 @@ VENV_SCRIPTS = os.path.join(PROJECT_ROOT, ".venv", "Scripts")
 GALLERY_DL_PATH = os.path.join(VENV_SCRIPTS, "gallery-dl.exe")
 YT_DLP_PATH = os.path.join(VENV_SCRIPTS, "yt-dlp.exe")
 
+# Try to find gallery-dl in PATH (for Linux/Render)
+def get_gallery_dl_command():
+    """Find gallery-dl command - checks Windows .exe first, then PATH"""
+    if os.path.exists(GALLERY_DL_PATH):
+        return GALLERY_DL_PATH
+    # Check if gallery-dl is in PATH (Linux/Render)
+    try:
+        result = subprocess.run(['gallery-dl', '--version'], capture_output=True, timeout=2)
+        if result.returncode == 0:
+            return 'gallery-dl'
+    except:
+        pass
+    return None
+
 download_status = {
     'status': 'Ready',
     'progress': 0,
@@ -682,11 +696,12 @@ def profile_analyze():
     if not profile_url:
         return jsonify({'error': 'No URL provided'}), 400
 
-    if not os.path.exists(GALLERY_DL_PATH):
+    gallery_dl_cmd = get_gallery_dl_command()
+    if not gallery_dl_cmd:
         return jsonify({'error': 'gallery-dl not installed. Use single link mode instead.'}), 501
 
     try:
-        cmd = [GALLERY_DL_PATH, "--get-urls", "--range", "1-12", profile_url]
+        cmd = [gallery_dl_cmd, "--get-urls", "--range", "1-12", profile_url]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = process.communicate(timeout=30)
 
@@ -715,7 +730,8 @@ def profile_download():
     if not profile_url:
         return jsonify({'error': 'No URL provided'}), 400
 
-    if not os.path.exists(GALLERY_DL_PATH):
+    gallery_dl_cmd = get_gallery_dl_command()
+    if not gallery_dl_cmd:
         return jsonify({'error': 'gallery-dl not installed. Use single link mode instead.'}), 501
 
     download_status.update({
@@ -725,18 +741,18 @@ def profile_download():
         'error': None
     })
 
-    thread = threading.Thread(target=run_profile_download, args=(profile_url,))
+    thread = threading.Thread(target=run_profile_download, args=(profile_url, gallery_dl_cmd))
     thread.start()
     return jsonify({'message': 'Bulk download started'})
 
-def run_profile_download(url):
+def run_profile_download(url, gallery_dl_cmd):
     local_download_dir = os.path.join(os.getcwd(), "downloads", "profile_extract_" + datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
     if not os.path.exists(local_download_dir):
         os.makedirs(local_download_dir)
 
     try:
         download_status['status'] = "Downloading Profile Media..."
-        cmd = [GALLERY_DL_PATH, "-d", local_download_dir, "--range", "1-50", url]
+        cmd = [gallery_dl_cmd, "-d", local_download_dir, "--range", "1-50", url]
 
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
