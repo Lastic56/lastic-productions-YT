@@ -11,8 +11,24 @@ import re
 import urllib.parse
 import urllib.request
 from threading import Timer
+import sys
 
 app = Flask(__name__)
+
+# Check for FFmpeg availability
+def check_ffmpeg():
+    try:
+        result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            print("[OK] FFmpeg found - audio conversion enabled")
+            return True
+    except:
+        pass
+    print("[WARNING] FFmpeg not found - audio conversion will not work (video will download as MP4)")
+    print("  Install FFmpeg: https://ffmpeg.org/download.html")
+    return False
+
+FFMPEG_AVAILABLE = check_ffmpeg()
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__)) if 'Flask app' not in os.getcwd() else os.path.dirname(os.getcwd())
 VENV_SCRIPTS = os.path.join(PROJECT_ROOT, ".venv", "Scripts")
@@ -524,7 +540,6 @@ def run_download(url, quality, audio_format, bitrate, platform='unknown', downlo
     ydl_opts = build_ydl_opts(platform, {
         'progress_hooks': [progress_hook],
         'outtmpl': outtmpl,
-        'merge_output_format': 'mp4',
     })
 
     if playlist_detected:
@@ -538,12 +553,18 @@ def run_download(url, quality, audio_format, bitrate, platform='unknown', downlo
         ydl_opts['writeautomaticsub'] = True
 
     if quality == 'Audio Only':
+        if not FFMPEG_AVAILABLE:
+            print("ERROR: FFmpeg not available. Cannot convert to audio format.")
+            download_status['error'] = "FFmpeg not installed. Cannot convert to MP3/M4A. Please install FFmpeg to use audio-only downloads."
+            download_status['status'] = "Error"
+            return
         ydl_opts['format'] = 'bestaudio/best'
         ydl_opts['postprocessors'] = [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': audio_format,
             'preferredquality': bitrate
         }]
+        print(f"Audio extraction configured: {audio_format} @ {bitrate}kbps")
     elif quality == 'Best':
         # For generic platforms, use more flexible format selection
         if platform == 'generic':
@@ -587,6 +608,15 @@ def run_download(url, quality, audio_format, bitrate, platform='unknown', downlo
                     base, _ = os.path.splitext(final_filename)
                     final_filename = f"{base}.{audio_format}"
 
+            # For audio-only, also check if the audio file exists (FFmpeg may have created it)
+            if quality == 'Audio Only' and final_filename and not final_filename.endswith(f".{audio_format}"):
+                base, _ = os.path.splitext(final_filename)
+                audio_file = f"{base}.{audio_format}"
+                if os.path.exists(audio_file):
+                    final_filename = audio_file
+                    print(f"Found converted audio file: {audio_file}")
+
+            print(f"Final file path: {final_filename}")
             download_status['title'] = info.get('title', 'Video')
             download_status['file_path'] = final_filename
             download_status['status'] = "Completed"
