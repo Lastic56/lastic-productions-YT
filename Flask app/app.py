@@ -132,19 +132,24 @@ def get_platform_headers(platform):
         headers['Authorization'] = 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA'
         headers['Referer'] = 'https://www.twitter.com/'
     elif platform == 'youtube':
-        headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
+        # Use more realistic headers to avoid blocking
+        headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
         headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
         headers['Accept-Language'] = 'en-US,en;q=0.9'
         headers['Sec-Fetch-Mode'] = 'navigate'
         headers['Sec-Fetch-Site'] = 'none'
+        headers['Sec-Fetch-User'] = '?1'
+        headers['Sec-Ch-Ua'] = '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"'
+        headers['Sec-Ch-Ua-Mobile'] = '?0'
+        headers['Sec-Ch-Ua-Platform'] = '"Windows"'
     return headers
 
 def get_extractor_args(platform, has_cookies=False):
     args = {}
     if platform == 'youtube':
-        # Use multiple clients for better reliability
+        # Use multiple clients for better reliability on cloud platforms
         args['youtube'] = {
-            'player_client': ['android', 'ios', 'web'],
+            'player_client': ['android', 'ios', 'web', 'android_music', 'android_vr'],
         }
     elif platform == 'twitter':
         args['twitter'] = {
@@ -191,6 +196,13 @@ def build_ydl_opts(platform, extra_opts=None):
     if platform == 'youtube':
         opts['nocheckcertificate'] = True
         opts['ignoreerrors'] = 'download'
+        # Add YouTube-specific bypass options
+        opts['extractor_args'] = {
+            'youtube': {
+                'player_client': ['android', 'ios', 'web', 'android_music', 'android_vr'],
+                'player_skip': ['configs', 'webgl', 'js'],
+            }
+        }
     cookie_path = get_cookie_path()
     if os.path.exists(cookie_path):
         opts['cookiefile'] = cookie_path
