@@ -99,6 +99,24 @@ def detect_platform(url):
         return 'twitter'
     elif 'pornhub.com' in url_lower:
         return 'pornhub'
+    elif 'youporn.com' in url_lower:
+        return 'youporn'
+    elif 'redtube.com' in url_lower:
+        return 'redtube'
+    elif 'xvideos.com' in url_lower:
+        return 'xvideos'
+    elif 'xnxx.com' in url_lower:
+        return 'xnxx'
+    elif 'brazzers.com' in url_lower:
+        return 'brazzers'
+    elif 'xhamster.com' in url_lower:
+        return 'xhamster'
+    elif 'spankbang.com' in url_lower:
+        return 'spankbang'
+    elif 'tube8.com' in url_lower:
+        return 'tube8'
+    elif 'youjizz.com' in url_lower:
+        return 'youjizz'
     return 'generic'
 
 def is_playlist(url):
@@ -455,7 +473,9 @@ def analyze():
         return jsonify({'error': f"YouTube: This video may be restricted or unavailable. Try updating yt-dlp or use a different video."}), 500
     elif platform == 'pornhub':
         return jsonify({'error': f"PornHub: Could not extract video. The video may be private or removed."}), 500
-    
+    elif platform in ['youporn', 'redtube', 'xvideos', 'xnxx', 'brazzers', 'xhamster', 'spankbang', 'tube8', 'youjizz']:
+        return jsonify({'error': f"{platform.capitalize()}: Could not extract video. The video may be private, removed, or requires premium."}), 500
+
     return jsonify({'error': err_msg}), 500
 
 @app.route('/search', methods=['POST'])
