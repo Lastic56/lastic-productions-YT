@@ -736,6 +736,7 @@ def run_profile_download(url):
 
 if __name__ == '__main__':
     import socket
+    port = int(os.environ.get('PORT', 5001))
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         s.connect(('8.8.8.8', 80))
@@ -746,12 +747,12 @@ if __name__ == '__main__':
         s.close()
 
     print(f"\n* Lastic Productions Flask Server Ready!")
-    print(f"* Local Address: http://127.0.0.1:5001")
-    print(f"* Network Address: http://{ip}:5001 (Open this on your phone!)\n")
+    print(f"* Local Address: http://127.0.0.1:{port}")
+    print(f"* Network Address: http://{ip}:{port} (Open this on your phone!)\n")
 
     def open_browser():
-        webbrowser.open_new("http://127.0.0.1:5001")
+        webbrowser.open_new(f"http://127.0.0.1:{port}")
 
     Timer(1.5, open_browser).start()
 
-    app.run(host='0.0.0.0', port=5001, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)
