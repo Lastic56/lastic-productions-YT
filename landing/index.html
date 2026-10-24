@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lastic Productions &bull; Studio Cyber</title>
+    <meta name="description" content="Multi-platform video downloader. Download videos & audio from YouTube, TikTok, Instagram, Twitter/X, Facebook and more.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Splash Screen Loader -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <span class="brand-dot">&bull;</span> LASTIC<br>
+                <span class="splash-sub">PRODUCTIONS</span>
+            </div>
+            <div class="splash-message" id="splash-message">
+                Tired of tools that never work?
+            </div>
+            <div class="splash-divider"></div>
+            <div class="splash-loader">
+                <div class="loader-bar">
+                    <div class="loader-fill" id="loader-fill"></div>
+                </div>
+                <div class="loader-text" id="loader-text">Initializing...</div>
+            </div>
+            <div class="splash-hint">
+                Click anywhere to skip &rarr;
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="brand-dot">&bull;</span> LASTIC PRODUCTIONS
+        </div>
+        <div class="nav-links">
+        <a href="#welcome">Welcome</a>
+        <a href="#tool">Enter Tool</a>
+        <a href="download.html">Download Apps</a>
+        <a href="about.html">About</a>
+        <a href="#support">Support</a>
+        </div>
+        <a href="#" class="nav-btn">Use Online Tool</a>
+    </nav>
+
+    <!-- Section 1: Welcome -->
+    <section id="welcome" class="section welcome">
+        <div class="container">
+            <div class="welcome-content">
+                <div class="badge">STUDIO CYBER &bull; 2026</div>
+                <h1>Download videos <span class="gradient-text">from anywhere.</span></h1>
+                <p class="subtitle">Multi-platform video &amp; audio downloader for YouTube, TikTok, Instagram, Twitter/X, Facebook, Reddit, Vimeo and more.</p>
+                <div class="hero-actions">
+                    <a href="#tool" class="btn btn-primary">Enter Tool</a>
+                    <a href="#download" class="btn btn-outline">Download Apps</a>
+                </div>
+                <div class="platforms">
+                    <span class="chip">YouTube</span>
+                    <span class="chip">TikTok</span>
+                    <span class="chip">Instagram</span>
+                    <span class="chip">Twitter/X</span>
+                    <span class="chip">Facebook</span>
+                    <span class="chip">Reddit</span>
+                    <span class="chip">Vimeo</span>
+                    <span class="chip">More</span>
+                </div>
+            </div>
+            <div class="welcome-visual">
+                <div class="glitch-card">
+                    <div class="card-screen">
+                        <div class="screen-header">LASTIC DOWNLOADER</div>
+                        <div class="screen-body">
+                            <div class="url-bar">https://youtube.com/watch?v=...</div>
+                            <div class="preview-area">
+                                <div class="thumb-placeholder"></div>
+                                <div class="download-status">Ready to download</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Enter Tool (App UI Preview) -->
+    <section id="tool" class="section enter-tool">
+        <div class="container">
+            <div class="section-header">
+                <h2>Enter the Tool</h2>
+                <p>Paste any video link and download it instantly &mdash; no installation required.</p>
+            </div>
+
+            <!-- Live status + URL -->
+            <div class="tool-header">
+                <span class="tool-status online">&bull; Live</span>
+                <span class="tool-url">lastic-productions.onrender.com</span>
+            </div>
+
+            <!-- App UI Preview Card -->
+            <div class="app-preview-card">
+                <div class="app-header">
+                    <div class="app-title">LASTIC PRODUCTIONS</div>
+                    <div class="app-subtitle">Video &amp; Audio Downloader</div>
+                </div>
+
+                <!-- URL Input Section -->
+                <div class="app-section url-section">
+                    <label class="app-label">Enter Video URL</label>
+                    <div class="url-input-wrapper">
+                        <input type="text" id="app-url-input" placeholder="Paste YouTube/TikTok/Instagram link..." autocomplete="off">
+                        <button class="btn-analyze" id="app-analyze-btn">Analyze</button>
+                    </div>
+                    <p class="app-hint">Supports YouTube, TikTok, Instagram, Twitter/X, Facebook, Reddit, Vimeo &amp; more</p>
+                </div>
+
+                <!-- Preview / Info Card -->
+                <div class="app-section preview-card" id="app-preview-card" style="display:none;">
+                    <div class="preview-thumb">
+                        <img id="app-thumb" src="" alt="Thumbnail" class="thumb-img">
+                        <div class="thumb-overlay" id="thumb-overlay">No thumbnail</div>
+                    </div>
+                    <div class="preview-info">
+                        <div class="video-title" id="app-video-title">Video Title Will Appear Here</div>
+                        <div class="video-meta" id="app-video-meta">Fetching information...</div>
+                    </div>
+                </div>
+
+                <!-- Quality Selection -->
+                <div class="app-section quality-section">
+                    <label class="app-label">Quality</label>
+                    <div class="spinner-wrapper">
+                        <select id="app-quality-spinner" class="app-spinner">
+                            <option value="best">Best Available</option>
+                            <option value="1080">1080p</option>
+                            <option value="720">720p</option>
+                            <option value="480">480p</option>
+                            <option value="360">360p</option>
+                            <option value="audio">Audio Only (MP3)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Audio Controls (shown when Audio Only selected) -->
+                <div class="app-section audio-controls" id="app-audio-controls" style="display:none;">
+                    <div class="audio-row">
+                        <label class="app-label">Format</label>
+                        <select class="app-spinner">
+                            <option>MP3</option>
+                            <option>M4A</option>
+                            <option>WAV</option>
+                        </select>
+                    </div>
+                    <div class="audio-row">
+                        <label class="app-label">Bitrate</label>
+                        <select class="app-spinner">
+                            <option>320</option>
+                            <option>256</option>
+                            <option>192</option>
+                            <option>128</option>
+                            <option>64</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="app-section action-section">
+                    <button class="btn-download btn-download-video" id="app-download-video" disabled>
+                        <span class="btn-icon">▶</span> Download Video
+                    </button>
+                    <button class="btn-download btn-download-mp3" id="app-download-mp3" disabled>
+                        <span class="btn-icon">♪</span> Quick MP3
+                    </button>
+                </div>
+
+                <!-- Progress Section -->
+                <div class="app-section progress-section">
+                    <div class="progress-header">
+                        <span id="app-status-text">READY</span>
+                        <span id="app-speed-eta"></span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="app-progress-fill"></div>
+                    </div>
+                    <div class="progress-percent" id="app-progress-percent">0%</div>
+                </div>
+
+                <!-- Log Section -->
+                <div class="app-section log-section">
+                    <div class="log-header">
+                        <span>SYSTEM LOG</span>
+                        <button class="btn-clear-log" id="app-clear-log">CLEAR</button>
+                    </div>
+                    <div class="log-body" id="app-log-body">
+                        <div class="log-entry log-init">[i]Log initialized...[/i]</div>
+                    </div>
+                </div>
+
+                <!-- Launch CTA -->
+                <div class="app-footer-cta">
+                    <a href="https://lastic-productions.onrender.com" target="_blank" rel="noopener noreferrer" class="btn btn-launch-app">
+                        <span class="launch-icon">→</span> Open Full Web Downloader
+                    </a>
+                    <p class="app-footer-note">Interactive preview below &mdash; click Analyze to simulate the flow</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Tabs -->
+    <section id="tabs" class="section tabs-section">
+        <div class="container">
+            <div class="tabs-wrapper">
+                <!-- Tab Buttons -->
+                <div class="tab-nav">
+                <button class="tab-btn active" data-tab="use">Use Tool</button>
+                <button class="tab-btn" onclick="window.location.href='download.html'">Download</button>
+                <button class="tab-btn" data-tab="about">About &amp; How to Use</button>
+                </div>
+
+                <!-- Tab Panels -->
+                <div class="tab-panels">
+                    <!-- Tab: Use Tool -->
+                    <div class="tab-panel active" id="tab-use">
+                        <div class="tab-content">
+                            <h3>Use the Online Tool</h3>
+                            <p>Access the full-featured video downloader straight from your browser.</p>
+                            <div class="use-steps">
+                                <div class="step">
+                                    <span class="step-num">1</span>
+                                    <div>
+                                        <strong>Copy a link</strong><br>
+                                        <small>Paste any supported video URL</small>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <span class="step-num">2</span>
+                                    <div>
+                                        <strong>Choose quality</strong><br>
+                                        <small>Best, 1080p, 720p, MP3, and more</small>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <span class="step-num">3</span>
+                                    <div>
+                                        <strong>Download</strong><br>
+                                        <small>Save video or audio to your device</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="https://lastic-productions.onrender.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-wide">Launch Web Downloader</a>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Download -->
+                    <div class="tab-panel" id="tab-download">
+                        <div class="tab-content">
+                            <h3>Download Apps</h3>
+                            <p>Prefer a native app? Grab the desktop or mobile version.</p>
+                            <div class="download-grid">
+                                <div class="download-card">
+                                    <div class="card-icon">💻</div>
+                                    <h4>Desktop</h4>
+                                    <p>Windows &bull; macOS &bull; Linux</p>
+                                    <ul class="features-list">
+                                        <li>Full Kivy desktop UI</li>
+                                        <li>Folder picker &amp; cookies support</li>
+                                        <li>Cancel &amp; resume downloads</li>
+                                    </ul>
+                                    <a href="#" class="btn btn-outline btn-wide">Download Desktop</a>
+                                </div>
+                                <div class="download-card">
+                                    <div class="card-icon">📱</div>
+                                    <h4>Mobile (Android)</h4>
+                                    <p>APK &bull; API 21+</p>
+                                    <ul class="features-list">
+                                        <li>Saves to Downloads folder</li>
+                                        <li>Dark mode mobile UI</li>
+                                        <li>Background threading</li>
+                                    </ul>
+                                    <a href="#" class="btn btn-primary btn-wide">Download APK</a>
+                                </div>
+                            </div>
+                            <div class="source-link">
+                                <p>Prefer to build from source?</p>
+                                <a href="https://github.com/kinkysweetfeet90-ship-it/lastic-productions-YT" target="_blank" rel="noopener noreferrer" class="btn btn-outline">View on GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: About & How to Use -->
+                    <div class="tab-panel" id="tab-about">
+                        <div class="tab-content">
+                            <h3>About &amp; How to Use</h3>
+                            <div class="about-grid">
+                                <div class="about-card">
+                                    <h4>What is Lastic Productions?</h4>
+                                    <p>A free, open-source multi-platform video downloader built with Python, Kivy, Flask, and yt-dlp.</p>
+                                </div>
+                                <div class="about-card">
+                                    <h4>How to Use (Web)</h4>
+                                    <ol>
+                                        <li>Click <strong>Use Tool</strong> or <strong>Launch Web Downloader</strong>.</li>
+                                        <li>Paste your video URL into the input field.</li>
+                                        <li>Click <strong>Analyze</strong> to fetch video info.</li>
+                                        <li>Select quality or audio format.</li>
+                                        <li>Click <strong>Download</strong> and save your file.</li>
+                                    </ol>
+                                </div>
+                                <div class="about-card">
+                                    <h4>Supported Platforms</h4>
+                                    <p>YouTube, TikTok, Instagram, Twitter/X, Facebook, Reddit, Vimeo, Dailymotion, Twitch, Pinterest, LinkedIn, and most direct video links.</p>
+                                </div>
+                                <div class="about-card">
+                                    <h4>Disclaimer</h4>
+                                    <p>Only download content you own or have permission to save. Respect each platform's Terms of Service. Not affiliated with YouTube, X, Instagram, or TikTok.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support / Buy Me a Coffee -->
+    <section id="support" class="section support">
+        <div class="container">
+            <div class="coffee-card">
+                <div class="coffee-content">
+                    <span class="coffee-emoji">☕</span>
+                    <div class="coffee-text">
+                        <h3>Say thanks to the developer</h3>
+                        <p>Lastic Productions is free and open-source. If you find it useful, consider buying me a coffee to keep the project alive.</p>
+                    </div>
+                </div>
+                <div class="coffee-actions">
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-coffee">
+                        <span class="coffee-icon">☕</span> Buy Me a Coffee
+                    </a>
+                    <a href="https://github.com/kinkysweetfeet90-ship-it/lastic-productions-YT" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-coffee">
+                        ⭐ Star on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">LASTIC PRODUCTIONS</div>
+                <div class="footer-links">
+                    <a href="#welcome">Welcome</a>
+                    <a href="#tool">Enter Tool</a>
+                    <a href="download.html">Download Apps</a>
+                    <a href="about.html">About</a>
+                    <a href="#support">Support</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Lastic Productions &bull; Studio Cyber &bull; MIT License</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

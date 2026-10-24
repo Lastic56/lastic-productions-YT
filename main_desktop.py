@@ -67,7 +67,7 @@ KV = '''
         size_hint_y: None
         height: 80
         padding: [0, 10, 0, 20]
-        
+
         Label:
             text: 'LASTIC PRODUCTIONS'
             font_size: '28sp'
@@ -88,7 +88,7 @@ KV = '''
                     pos: self.x + self.width * 0.2, self.y + self.height * 0.3
                     size: self.width * 0.6, self.height * 0.4
             color: 1, 1, 1, 1
-        
+
         Label:
             text: 'High-Speed Video & Audio Downloader'
             font_size: '14sp'
@@ -102,7 +102,7 @@ KV = '''
     BoxLayout:
         orientation: 'vertical'
         size_hint_y: None
-        height: 100
+        height: 130
         spacing: 12
         padding: 20
         canvas.before:
@@ -167,6 +167,21 @@ KV = '''
                 font_size: '14sp'
                 on_release: root.fetch_info_threaded()
 
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 45
+            spacing: 12
+
+            Button:
+                text: 'LOAD COOKIES'
+                size_hint_x: 1
+                background_normal: ''
+                background_color: 0.2, 0.2, 0.4, 1
+                bold: True
+                font_size: '12sp'
+                on_release: root.load_cookies_threaded()
+
     # --- Preview Card ---
     BoxLayout:
         orientation: 'vertical'
@@ -188,7 +203,7 @@ KV = '''
             size_hint_y: None
             height: 70
             spacing: 15
-            
+
             AsyncImage:
                 id: thumbnail
                 source: ''
@@ -202,7 +217,7 @@ KV = '''
                         pos: self.pos
                         size: self.size
                         radius: [6,]
-            
+
             Label:
                 id: video_title_label
                 text: root.video_title
@@ -220,7 +235,7 @@ KV = '''
             size_hint_y: None
             height: 40
             spacing: 10
-            
+
             Label:
                 text: 'Video Quality:'
                 size_hint_x: 0.3
@@ -228,7 +243,7 @@ KV = '''
                 color: 0.63, 0.63, 0.63, 1
                 halign: 'left'
                 text_size: self.size
-            
+
             Spinner:
                 id: quality_spinner
                 text: 'Select Quality'
@@ -246,7 +261,7 @@ KV = '''
             height: 40 if 'Audio' in root.current_quality else 0
             opacity: 1 if 'Audio' in root.current_quality else 0
             spacing: 10
-            
+
             Label:
                 text: 'Format:'
                 size_hint_x: 0.3
@@ -254,7 +269,7 @@ KV = '''
                 color: 0.63, 0.63, 0.63, 1
                 halign: 'left'
                 text_size: self.size
-            
+
             Spinner:
                 id: audio_format_spinner
                 text: 'MP3'
@@ -270,7 +285,7 @@ KV = '''
             height: 40 if 'Audio' in root.current_quality else 0
             opacity: 1 if 'Audio' in root.current_quality else 0
             spacing: 10
-            
+
             Label:
                 text: 'Bitrate:'
                 size_hint_x: 0.3
@@ -278,7 +293,7 @@ KV = '''
                 color: 0.63, 0.63, 0.63, 1
                 halign: 'left'
                 text_size: self.size
-            
+
             Spinner:
                 id: audio_quality_spinner
                 text: '320'
@@ -348,7 +363,7 @@ KV = '''
             orientation: 'horizontal'
             size_hint_y: None
             height: 20
-            
+
             Label:
                 id: status_label
                 text: 'READY'
@@ -358,7 +373,7 @@ KV = '''
                 size_hint_x: 0.7
                 halign: 'left'
                 text_size: self.size
-            
+
             Label:
                 id: speed_eta_label
                 text: ''
@@ -394,7 +409,7 @@ KV = '''
         orientation: 'vertical'
         size_hint_y: 1
         spacing: 0
-        
+
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
@@ -408,7 +423,7 @@ KV = '''
                     pos: self.pos
                     size: self.size
                     radius: [12, 12, 0, 0]
-            
+
             Label:
                 text: 'SYSTEM LOG'
                 font_size: '12sp'
@@ -417,7 +432,7 @@ KV = '''
                 size_hint_x: 0.8
                 halign: 'left'
                 text_size: self.size
-            
+
             Button:
                 text: 'CLEAR'
                 size_hint_x: 0.2
@@ -459,18 +474,19 @@ class MainLayout(BoxLayout):
     current_quality = StringProperty('')
     download_thread = None
     cancel_requested = False
-    
+    cookies_file = None
+
     def log(self, message):
         print(f"APP_LOG: {message}")
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
         self.ids.log_label.text += f"[{timestamp}] {message}\\n"
-        
+
         # Auto-scroll to bottom
         Clock.schedule_once(self._scroll_to_bottom)
 
     def _scroll_to_bottom(self, dt):
         self.ids.log_scroll.scroll_y = 0
-        
+
     def clear_log(self):
         self.ids.log_label.text = 'System ready...\n'
         self.ids.progress_bar.value = 0
@@ -491,58 +507,80 @@ class MainLayout(BoxLayout):
         except Exception as e:
             self.log(f"Failed to paste: {str(e)}")
 
+    def load_cookies_threaded(self):
+        self.log("Opening cookies selector...")
+        threading.Thread(target=self.load_cookies, daemon=True).start()
+
+    def load_cookies(self):
+        if not HAS_TKINTER:
+            Clock.schedule_once(lambda dt: self.log("Cookies loading not supported on this platform"))
+            return
+        try:
+            root = tk.Tk()
+            root.withdraw()
+            root.attributes('-topmost', True)
+            file_path = filedialog.askopenfilename(
+                title="Select cookies.txt file",
+                filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+            )
+            root.destroy()
+
+            if file_path:
+                self.cookies_file = file_path
+                Clock.schedule_once(lambda dt: self.log(f"Cookies loaded: {os.path.basename(file_path)}"))
+            else:
+                Clock.schedule_once(lambda dt: self.log("No cookies file selected"))
+        except Exception as e:
+            Clock.schedule_once(lambda dt: self.log(f"Error loading cookies: {e}"))
+
     def fetch_info_threaded(self):
         url = self.ids.url_input.text.strip()
         if not url:
             self.log("Please enter a URL first.")
             return
-        
+
         self.ids.status_label.text = "Fetching video info..."
         self.ids.quality_spinner.text = "Loading..."
         self.ids.download_btn.disabled = True
-        
-        threading.Thread(target=self.fetch_info, args=(url,), daemon=True).start()
 
+        threading.Thread(target=self.fetch_info, args=(url,), daemon=True).start()
 
     def fetch_info(self, url):
         ydl_opts = {
-            'quiet': True, 
+            'quiet': True,
             'no_warnings': True,
             'logger': YtdlpLogger(),
-            # Add user agent to help with Twitter/X
+            'nocheckcertificate': True,
+            'ignoreerrors': True,
             'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         }
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
-                
-                # Get Title and Thumbnail
+
                 title = info.get('title', 'Unknown Title')
                 thumb = info.get('thumbnail', '')
-                
-                # Get Formats
+
                 formats = info.get('formats', [])
                 valid_qualities = set()
-                
+
                 for f in formats:
-                    # Filter for video only or video+audio content
                     if f.get('vcodec') != 'none':
                         height = f.get('height')
                         if height:
                             valid_qualities.add(f"{height}p")
-                
-                # Sort qualities
+
                 sorted_qualities = sorted(list(valid_qualities), key=lambda x: int(x.replace('p', '')), reverse=True)
                 sorted_qualities.insert(0, 'Best')
                 sorted_qualities.append('Audio Only')
-                
+
                 Clock.schedule_once(lambda dt: self.update_ui_with_info(title, thumb, sorted_qualities))
-                
+
         except Exception as e:
             err = str(e)
-            print(f"Full error: {err}")  # Debug print
+            print(f"Full error: {err}")
             Clock.schedule_once(lambda dt: self.error_ui(f"Fetch failed: {err}"))
 
     def update_ui_with_info(self, title, thumb, qualities):
@@ -560,7 +598,7 @@ class MainLayout(BoxLayout):
         if not url:
             self.log("Error: Please enter a URL")
             return
-        
+
         self.log("Forcing MP3 High-Quality Download...")
         self.ids.quality_spinner.text = "Audio Only"
         self.ids.audio_format_spinner.text = "MP3"
@@ -572,7 +610,7 @@ class MainLayout(BoxLayout):
         quality_text = self.ids.quality_spinner.text
         audio_format = self.ids.audio_format_spinner.text.lower() if 'Audio' in quality_text else None
         audio_quality = self.ids.audio_quality_spinner.text if 'Audio' in quality_text else None
-        
+
         if not url:
             self.log("Error: Please enter a URL")
             return
@@ -580,86 +618,100 @@ class MainLayout(BoxLayout):
         # Reset cancel flag
         self.cancel_requested = False
 
+        # To prevent UI freeze, we move the directory selection and the download
+        # into a single background thread.
+        self.log("Preparing download...")
+        self.show_cancel_button()
+
+        self.download_thread = threading.Thread(
+            target=self.download_preparation_and_thread,
+            args=(url, quality_text, audio_format, audio_quality),
+            daemon=True
+        )
+        self.download_thread.start()
+
+    def download_preparation_and_thread(self, url, quality_text, audio_format, audio_quality):
         # Choose download location (desktop only)
         download_dir = None
         if platform != "android" and HAS_TKINTER:
             try:
+                # We must initialize Tk in the thread it's used in
                 root = tk.Tk()
-                root.withdraw()  # Hide the main window
-                root.attributes('-topmost', True)  # Bring dialog to front
+                root.withdraw()
+                root.attributes('-topmost', True)
                 download_dir = filedialog.askdirectory(
                     title="Choose Download Location",
                     initialdir=os.getcwd()
                 )
                 root.destroy()
-                
-                if not download_dir:  # User cancelled
-                    self.log("Download cancelled - no folder selected")
+
+                if not download_dir:
+                    Clock.schedule_once(lambda dt: self.log("Download cancelled - no folder selected"))
+                    Clock.schedule_once(lambda dt: self.hide_cancel_button())
                     return
             except Exception as e:
-                self.log(f"Folder dialog error: {e}")
+                print(f"Folder dialog error: {e}")
                 download_dir = os.getcwd()
-        
-        self.ids.status_label.text = "Initializing..."
-        self.log(f"Starting download: {quality_text}" + (f" ({audio_format.upper()} {audio_quality}kbps)" if audio_format else ""))
-        
-        # Show cancel button, hide download buttons
-        self.show_cancel_button()
-        
-        self.download_thread = threading.Thread(target=self.download_thread_func, args=(url, quality_text, download_dir, audio_format, audio_quality), daemon=True)
-        self.download_thread.start()
+
+        # Now call the actual download function
+        self.download_thread_func(url, quality_text, download_dir, audio_format, audio_quality)
 
     def cancel_download(self):
         self.cancel_requested = True
         self.log("Cancelling download...")
         self.ids.status_label.text = "Cancelling..."
         self.hide_cancel_button()
-        
+
     def show_cancel_button(self):
         self.ids.cancel_btn.height = 50
         self.ids.cancel_btn.opacity = 1
         self.ids.cancel_btn.disabled = False
         self.ids.download_btn.disabled = True
         self.ids.mp3_btn.disabled = True
-        
+
     def hide_cancel_button(self):
         self.ids.cancel_btn.height = 0
         self.ids.cancel_btn.opacity = 0
         self.ids.cancel_btn.disabled = True
 
     def download_thread_func(self, url, quality_text, download_dir=None, audio_format=None, audio_quality=None):
-        ydl_opts = {
+        base_opts = {
             'progress_hooks': [self.progress_hook],
             'outtmpl': '%(title)s.%(ext)s',
             'quiet': True,
-            'no_warnings': True,
+            'no_warnings': False,
             'logger': YtdlpLogger(),
+            'nocheckcertificate': True,
+            'ignoreerrors': True,
             'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate',
-                'DNT': '1',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Referer': 'https://www.google.com/',
             },
             'extractor_args': {
                 'youtube': {
                     'player_client': ['android', 'web'],
                     'player_skip': ['configs', 'webpage'],
+                },
+                'twitter': {
+                    'guest_token': None, # Let yt-dlp handle token rotation
                 }
             },
-            'extractor_retries': 3,
-            'fragment_retries': 3,
+            'extractor_retries': 5,
+            'fragment_retries': 10,
+            'retries': 10,
+            'socket_timeout': 30,
             'retry_sleep_functions': {
                 'http': lambda x: min(x * 2, 30),
                 'fragment': lambda x: min(x * 2, 30)
             }
         }
+        if self.cookies_file:
+            base_opts['cookiefile'] = self.cookies_file
 
         # Platform specific paths
         if download_dir:
-            # Use the chosen directory
             pass
         elif platform == "android":
             from android.storage import primary_external_storage_path
@@ -667,41 +719,60 @@ class MainLayout(BoxLayout):
             download_dir = os.path.join(dir_path, 'Download')
         else:
             download_dir = os.getcwd()
-            
+
         if not os.path.exists(download_dir):
             try:
                 os.makedirs(download_dir)
             except:
-                pass 
+                pass
                 download_dir = os.getcwd()
 
-        ydl_opts['paths'] = {'home': download_dir}
+        base_opts['paths'] = {'home': download_dir}
 
         # Quality configuration
         if quality_text == 'Audio Only':
+            ydl_opts = dict(base_opts)
             ydl_opts['format'] = 'bestaudio/best'
-            # Use selected audio format or default to mp3
             codec = audio_format if audio_format else 'mp3'
             bitrate = audio_quality if audio_quality else '320'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': codec,
-                'preferredquality': bitrate if codec in ['mp3', 'm4a'] else '0',  # Use bitrate for MP3/M4A, best for others
+                'preferredquality': bitrate if codec in ['mp3', 'm4a'] else '0',
             }]
         elif quality_text == 'Best':
+            ydl_opts = dict(base_opts)
             ydl_opts['format'] = 'bestvideo+bestaudio/best'
         else:
-             # e.g., 1080p -> 1080
             height = quality_text.replace('p', '')
+            ydl_opts = dict(base_opts)
             ydl_opts['format'] = f'bestvideo[height<={height}]+bestaudio/best[height<={height}]'
+
+        def do_download(opts):
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(url, download=True)
+                return info
 
         try:
             Clock.schedule_once(lambda dt: self.log(f"Saving to: {download_dir}"))
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                title = info.get('title', 'Video')
-                if not self.cancel_requested:
-                    Clock.schedule_once(lambda dt: self.success_ui(title))
+            try:
+                info = do_download(ydl_opts)
+            except Exception:
+                fb = dict(base_opts)
+                fb['format'] = 'best/best'
+                if quality_text == 'Audio Only':
+                    fb['format'] = 'bestaudio/best'
+                    codec = audio_format if audio_format else 'mp3'
+                    bitrate = audio_quality if audio_quality else '320'
+                    fb['postprocessors'] = [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': codec,
+                        'preferredquality': bitrate if codec in ['mp3', 'm4a'] else '0',
+                    }]
+                info = do_download(fb)
+            title = info.get('title', 'Video')
+            if not self.cancel_requested:
+                Clock.schedule_once(lambda dt: self.success_ui(title))
         except Exception as e:
             if not self.cancel_requested:
                 error_msg = str(e)
@@ -712,22 +783,17 @@ class MainLayout(BoxLayout):
     def progress_hook(self, d):
         if d['status'] == 'downloading':
             try:
-                # Try multiple ways to get progress
                 if 'downloaded_bytes' in d and 'total_bytes' in d:
                     progress = (d['downloaded_bytes'] / d['total_bytes']) * 100
                 elif 'downloaded_bytes' in d and 'total_bytes_estimate' in d:
                     progress = (d['downloaded_bytes'] / d['total_bytes_estimate']) * 100
                 else:
-                    # Fallback to percent string
                     p_str = d.get('_percent_str', '0%').strip().replace('%', '')
                     progress = float(p_str) if p_str else 0
-                
+
                 speed = d.get('_speed_str', 'N/A')
                 eta = d.get('_eta_str', 'N/A')
-                
-                # Log to console for debugging
-                print(f"PROGRESS: {progress:.1f}% | Speed: {speed} | ETA: {eta}")
-                
+
                 Clock.schedule_once(lambda dt: self.update_progress(progress, speed, eta))
             except Exception as e:
                 print(f"Progress hook error: {e}")
@@ -748,10 +814,9 @@ class MainLayout(BoxLayout):
         self.ids.speed_eta_label.text = ""
         self.ids.download_btn.disabled = False
         self.ids.mp3_btn.disabled = False
-        self.hide_cancel_button()  # Hide cancel button
+        self.hide_cancel_button()
         self.log(f"Successfully downloaded: {title}")
-        
-        # Animation: Bright Green Pulse
+
         anim = Animation(color=(0, 1, 0, 1), font_size=18, duration=0.2, t='out_quad')
         anim += Animation(color=(0.8, 0.8, 0.8, 1), font_size=14, duration=0.5, t='in_quad')
         anim.start(self.ids.status_label)
@@ -761,13 +826,12 @@ class MainLayout(BoxLayout):
         self.log(f"Error: {msg}")
         self.ids.download_btn.disabled = False
         self.ids.mp3_btn.disabled = False
-        self.hide_cancel_button()  # Hide cancel button
+        self.hide_cancel_button()
 
 class VideoDownloaderApp(App):
     title = "Lastic Productions"
     def build(self):
         Builder.load_string(KV)
-        # Set window size for desktop
         from kivy.config import Config
         Config.set('graphics', 'width', '800')
         Config.set('graphics', 'height', '700')
@@ -776,7 +840,6 @@ class VideoDownloaderApp(App):
 
     def on_start(self):
         check_permissions()
-        # Focus on the URL input field when app starts
         def focus_input(dt):
             if hasattr(self, 'root') and self.root and hasattr(self.root.ids, 'url_input'):
                 self.root.ids.url_input.focus = True

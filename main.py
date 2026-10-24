@@ -340,7 +340,9 @@ class MainLayout(BoxLayout):
         threading.Thread(target=self.fetch_info, args=(url,), daemon=True).start()
 
     def fetch_info(self, url):
-        ydl_opts = {'quiet': True, 'no_warnings': True, 'logger': YtdlpLogger()}
+        ydl_opts = {
+            'quiet': True, 'no_warnings': True, 'logger': YtdlpLogger()
+        }
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
@@ -402,27 +404,54 @@ class MainLayout(BoxLayout):
         threading.Thread(target=self.download_thread, args=(url, quality_text, download_dir, audio_format, audio_quality), daemon=True).start()
 
     def download_thread(self, url, quality_text, download_dir, audio_format, audio_quality):
-        ydl_opts = {
+        base_opts = {
             'progress_hooks': [self.progress_hook],
             'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
-            'quiet': True, 'no_warnings': True, 'logger': YtdlpLogger()
+            'quiet': True, 'no_warnings': True, 'logger': YtdlpLogger(),
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            },
+            'nocheckcertificate': True,
+            'ignoreerrors': True,
+            'retries': 10,
+            'fragment_retries': 10,
+            'socket_timeout': 30,
+            'extractor_retries': 5,
         }
 
         if quality_text == 'Audio Only':
+            ydl_opts = dict(base_opts)
             ydl_opts['format'] = 'bestaudio/best'
             codec = audio_format or 'mp3'
             bitrate = audio_quality or '320'
             ydl_opts['postprocessors'] = [{'key': 'FFmpegExtractAudio', 'preferredcodec': codec, 'preferredquality': bitrate}]
         elif quality_text == 'Best':
+            ydl_opts = dict(base_opts)
             ydl_opts['format'] = 'bestvideo+bestaudio/best'
         else:
             height = quality_text.replace('p', '')
+            ydl_opts = dict(base_opts)
             ydl_opts['format'] = f'bestvideo[height<={height}]+bestaudio/best'
 
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        def do_download(opts):
+            with yt_dlp.YoutubeDL(opts) as ydl:
                 info = ydl.extract_info(url, download=True)
-                Clock.schedule_once(lambda dt: self.success_ui(info.get('title', 'Video')))
+                return info
+
+        try:
+            try:
+                info = do_download(ydl_opts)
+            except Exception:
+                # Fall back to a single combined format if split streams fail
+                fb = dict(base_opts)
+                fb['format'] = 'best/best'
+                if quality_text == 'Audio Only':
+                    fb['format'] = 'bestaudio/best'
+                    codec = audio_format or 'mp3'
+                    bitrate = audio_quality or '320'
+                    fb['postprocessors'] = [{'key': 'FFmpegExtractAudio', 'preferredcodec': codec, 'preferredquality': bitrate}]
+                info = do_download(fb)
+            Clock.schedule_once(lambda dt: self.success_ui(info.get('title', 'Video')))
         except Exception as e:
             Clock.schedule_once(lambda dt: self.error_ui(str(e)))
 

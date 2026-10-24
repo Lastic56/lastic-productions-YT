@@ -125,7 +125,9 @@ def detect_platform(url):
         return 'brazzers'
     elif 'xhamster.com' in url_lower:
         return 'xhamster'
-    elif 'spankbang.com' in url_lower:
+    elif 'erome.com' in url_lower:
+        return 'erome'
+    elif 'spankbang.com' in url_lower or 'spankbang.party' in url_lower:
         return 'spankbang'
     elif 'tube8.com' in url_lower:
         return 'tube8'
@@ -163,6 +165,12 @@ def get_platform_headers(platform):
     elif platform == 'twitter':
         headers['Authorization'] = 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA'
         headers['Referer'] = 'https://www.twitter.com/'
+    elif platform in ('spankbang', 'erome'):
+        headers['Referer'] = 'https://www.google.com/'
+        headers['Sec-Fetch-Dest'] = 'document'
+        headers['Sec-Fetch-Mode'] = 'navigate'
+        headers['Sec-Fetch-Site'] = 'cross-site'
+        headers['Sec-Fetch-User'] = '?1'
     elif platform == 'youtube':
         # Use more realistic headers to avoid blocking
         headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
@@ -177,7 +185,8 @@ def get_platform_headers(platform):
     return headers
 
 def get_extractor_args(platform, has_cookies=False):
-    args = {}
+    # Impersonate a real browser for ALL sites to bypass Cloudflare/anti-bot challenges
+    args = {'generic': {'impersonate': ['chrome']}}
     if platform == 'youtube':
         # Use multiple clients for better reliability on cloud platforms
         args['youtube'] = {
@@ -197,6 +206,10 @@ def get_extractor_args(platform, has_cookies=False):
         args['tiktok'] = {
             'app_version': '34.1.2',
             'manifest_app_version': '34.1.2',
+        }
+    elif platform in ('spankbang', 'erome'):
+        args[platform] = {
+            'impersonate': ['chrome'],
         }
     return args
 
@@ -233,7 +246,8 @@ def build_ydl_opts(platform, extra_opts=None):
             'youtube': {
                 'player_client': ['android', 'ios', 'web', 'android_music', 'android_vr'],
                 'player_skip': ['configs', 'webgl', 'js'],
-            }
+            },
+            'generic': {'impersonate': ['chrome']},
         }
     cookie_path = get_cookie_path()
     if os.path.exists(cookie_path):
@@ -257,28 +271,58 @@ def get_cookie_path():
     return local
 
 def try_twitter_api(url):
-    parsed = urllib.parse.urlparse(re.sub(r'\?.*$', '', url))
-    api_url = "https://api.vxtwitter.com" + parsed.path
-    try:
-        req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read())
-            media = data.get('media_extended', [])
-            for m in media:
-                if m.get('type') == 'video' and 'url' in m:
+    # Clean URL to tweet path
+    parsed = urllib.parse.urlparse(url)
+    path = parsed.path
+    # Try multiple public Twitter API mirrors
+    mirrors = [
+        ('https://api.vxtwitter.com', ''),
+        ('https://api.fxtwitter.com', ''),
+        ('https://api.twittpr.com', ''),
+    ]
+    for base, _ in mirrors:
+        api_url = base + path
+        try:
+            req = urllib.request.Request(api_url, headers={
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json',
+            })
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read())
+
+            # Normalize media from different mirror schemas
+            media_list = []
+            # vxtwitter style
+            media_list += data.get('media_extended', []) or data.get('media', []) or []
+            # fxtwitter style: data['tweet']['media']['videos'/'photos']
+            tweet = data.get('tweet', {})
+            tmedia = tweet.get('media', {}) if isinstance(tweet, dict) else {}
+            if isinstance(tmedia, dict):
+                media_list += tmedia.get('videos', []) or []
+                media_list += tmedia.get('photos', []) or []
+                media_list += tmedia.get('all', []) or []
+
+            for m in media_list:
+                if not isinstance(m, dict):
+                    continue
+                mtype = m.get('type')
+                murl = m.get('url')
+                if mtype in ('video', 'animated_gif') and murl:
                     return {
-                        'title': data.get('text', 'Twitter Video'),
-                        'thumbnail': m.get('thumbnail_url', ''),
-                        'url': m['url']
+                        'title': (data.get('text') or tweet.get('text') or 'Twitter Video'),
+                        'thumbnail': m.get('thumbnail_url', '') or (tmedia.get('thumbnail_url', '') if isinstance(tmedia, dict) else ''),
+                        'url': murl,
                     }
-            return {
-                'title': data.get('text', 'Twitter Post'),
-                'thumbnail': data.get('user', {}).get('profile_image_url', '') if not media else media[0].get('thumbnail_url', ''),
-                'url': url
-            }
-    except Exception as e:
-        print(f"Twitter API bypass failed: {e}")
-        return None
+            if media_list:
+                return {
+                    'title': (data.get('text') or tweet.get('text') or 'Twitter Post'),
+                    'thumbnail': (media_list[0].get('thumbnail_url', '') if isinstance(media_list[0], dict) else ''),
+                    'url': url,
+                }
+        except Exception as e:
+            print(f"Twitter API {base} failed: {e}")
+            continue
+    return None
 
 def try_instagram_api(url):
     try:
@@ -339,6 +383,29 @@ def analyze():
                 'qualities': ['Best', 'Audio Only'],
                 'fixed_url': result['url']
             })
+        # Fallback: if API fails or no direct mp4, let yt-dlp try it
+        ydl_opts = build_ydl_opts('twitter')
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+                if info:
+                    formats = info.get('formats') or []
+                    valid_qualities = set()
+                    for f in formats:
+                        if f and f.get('vcodec') and f['vcodec'] != 'none':
+                            height = f.get('height')
+                            if height: valid_qualities.add(f"{height}p")
+                    sorted_q = sorted(valid_qualities, key=lambda x: int(x.replace('p', '')), reverse=True)
+                    sorted_q.insert(0, 'Best')
+                    sorted_q.append('Audio Only')
+                    return jsonify({
+                        'title': info.get('title', 'Twitter Video'),
+                        'thumbnail': info.get('thumbnail', ''),
+                        'qualities': sorted_q,
+                        'fixed_url': url
+                    })
+        except Exception as e:
+            print(f"Twitter yt-dlp fallback failed: {e}")
 
     if platform == 'instagram':
         result = try_instagram_api(url)
