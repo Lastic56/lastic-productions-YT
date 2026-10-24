@@ -35,34 +35,12 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential git zip unzip autoconf automake libtool \
           pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev \
-          libssl-dev ffmpeg ccache
+          libssl-dev ffmpeg ccache wget curl unzip
 
     - name: Install Buildozer
       run: |
         pip3 install --upgrade pip wheel setuptools
         pip3 install buildozer cython
-
-    - name: Cache Buildozer global dir
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.buildozer
-          ~/.cache/pip
-        key: buildozer-${{ runner.os }}-v2-${{ hashFiles('buildozer.spec') }}
-        restore-keys: buildozer-${{ runner.os }}-v2-
-
-    - name: Pre-install Android SDK into Buildozer's path
-      run: |
-        export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
-        mkdir -p $ANDROID_HOME/cmdline-tools
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/clt.zip || \
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O /tmp/clt.zip
-        unzip -o -q /tmp/clt.zip -d $ANDROID_HOME/cmdline-tools/
-        # cmdline-tools zip extracts to cmdline-tools/cmdline-tools/
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools/* $ANDROID_HOME/cmdline-tools/ 2>/dev/null || true
-        yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses > /dev/null || true
-        $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME \
-          "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
     - name: Build APK
       run: |
