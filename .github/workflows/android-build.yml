@@ -35,12 +35,23 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential git zip unzip autoconf automake libtool \
           pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev \
-          libssl-dev ffmpeg ccache wget curl unzip
+          libssl-dev ffmpeg ccache wget curl
 
     - name: Install Buildozer
       run: |
-        pip3 install --upgrade pip wheel setuptools
-        pip3 install buildozer cython
+        python -m pip install --upgrade pip wheel setuptools
+        python -m pip install buildozer cython
+
+    - name: Install Android SDK packages
+      run: |
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+          "platform-tools" \
+          "platforms;android-33" \
+          "build-tools;33.0.2" \
+          "extras;android;m2repository" \
+          "extras;google;m2repository" \
+          "ndk;25.2.9519653"
 
     - name: Build APK
       run: |
