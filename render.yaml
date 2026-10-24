@@ -1,25 +1,9 @@
 services:
   - type: web
-    name: lastic-downloader
-    runtime: python
-    rootDir: "Flask app"
-    buildCommand: |
-      pip install --upgrade pip &&
-      pip install yt-dlp==2024.12.13 &&
-      pip install flask==2.3.3 gunicorn==21.2.0 &&
-      pip install --pre yt-dlp[future]
-    startCommand: "gunicorn --worker-class gthread --workers 1 --threads 4 --timeout 120 app:app"
+    name: lastic-productions
+    env: docker
+    rootDir: .
+    dockerfilePath: Dockerfile
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.11"
-      - key: FLASK_ENV
-        value: "production"
-      - key: PYTHONUNBUFFERED
-        value: "1"
-    healthCheckPath: "/"
-    disk:
-      name: downloads
-      mountPath: /tmp/downloads
-      sizeGB: 2
-    autoDeploy: true
-    plan: starter
+      - key: PORT
+        value: 10000
