@@ -20,6 +20,7 @@ android.minapi = 21
 android.gradle_dependencies = androidx.core:core:1.9.0
 android.archs = arm64-v8a
 android.accept_sdk_license = True
+android.buildtools = 33.0.2
 android.allow_backup = True
 android.wakelock = True
 android.window_soft_input_mode = adjustResize
