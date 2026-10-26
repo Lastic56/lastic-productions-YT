@@ -1,0 +1,16 @@
+.git/
+.venv/
+dist/
+build/
+.buildozer/
+bin/
+__pycache__/
+landing/
+docs/
+test_zip/
+*.mkv
+*.zip
+Flask app/downloads/
+Flask app/build/
+Flask app/dist/
+Flask app/__pycache__/
