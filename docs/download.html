@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Apps &bull; Lastic Productions</title>
+    <meta name="description" content="Download Lastic Productions desktop and mobile apps. Available for Windows, macOS, Linux, and Android APK.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="brand-dot">&bull;</span> LASTIC PRODUCTIONS
+        </div>
+        <div class="nav-links">
+            <a href="index.html#welcome">Welcome</a>
+            <a href="index.html#tool">Enter Tool</a>
+            <a href="index.html#about">About</a>
+            <a href="index.html#support">Support</a>
+        </div>
+        <a href="index.html#tool" class="nav-btn">Use Online Tool</a>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <div class="badge">STUDIO CYBER &bull; DOWNLOADS</div>
+            <h1>Download Apps</h1>
+            <p>Get Lastic Productions on your device. Choose your platform below.</p>
+        </div>
+    </header>
+
+    <!-- Platform Selector -->
+    <section class="platform-picker" id="platform-picker">
+        <div class="container">
+            <div class="picker-header">
+                <h2>Which device?</h2>
+                <p>Select your platform to see the available downloads.</p>
+            </div>
+            <div class="platform-options">
+                <button class="platform-btn active" data-platform="pc">
+                    <span class="platform-icon">💻</span>
+                    <div class="platform-info">
+                        <strong>PC / Desktop</strong>
+                        <span>Windows • macOS • Linux</span>
+                    </div>
+                    <span class="platform-arrow">→</span>
+                </button>
+                <button class="platform-btn" data-platform="mobile">
+                    <span class="platform-icon">📱</span>
+                    <div class="platform-info">
+                        <strong>Mobile</strong>
+                        <span>Android APK</span>
+                    </div>
+                    <span class="platform-arrow">→</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PC Downloads -->
+    <section id="download-pc" class="download-section active">
+        <div class="container">
+            <div class="section-header">
+                <h2>Desktop App</h2>
+                <p>Full-featured Kivy desktop downloader with folder picker, cookies support, and cancel/resume.</p>
+            </div>
+            <div class="app-showcase">
+                <div class="app-image-placeholder">
+                    <img src="http://localhost:10028/wp-content/uploads/2026/10/screencapture-127-0-0-1-5001-2026-10-24-17_28_56.png" alt="Desktop App Screenshot" class="app-image" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                        <div class="placeholder-content" style="display:none;">
+                            <span class="placeholder-icon">💻</span>
+                            <span class="placeholder-text">Desktop App</span>
+                        </div>
+                </div>
+                </div>
+                <div class="app-details">
+                    <div class="app-specs">
+                        <div class="spec-item">
+                            <span class="spec-label">Platform</span>
+                            <span class="spec-value">Windows, macOS, Linux</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Framework</span>
+                            <span class="spec-value">Kivy 2.x + Python</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Engine</span>
+                            <span class="spec-value">yt-dlp</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Audio</span>
+                            <span class="spec-value">MP3, M4A, WAV, OPUS, FLAC</span>
+                        </div>
+                    </div>
+                    <ul class="app-features">
+                        <li><span class="feature-check">✓</span> Native desktop UI (Kivy)</li>
+                        <li><span class="feature-check">✓</span> Folder picker for save location</li>
+                        <li><span class="feature-check">✓</span> Load cookies.txt for restricted sites</li>
+                        <li><span class="feature-check">✓</span> Cancel &amp; resume downloads</li>
+                        <li><span class="feature-check">✓</span> Background threading (no UI freeze)</li>
+                        <li><span class="feature-check">✓</span> Real-time progress, speed &amp; ETA</li>
+                    </ul>
+                    <div class="app-actions">
+                        <a href="https://github.com/Lastic56/lastic-productions-YT/releases" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-wide">Download for Windows</a>
+                        <a href="https://github.com/Lastic56/lastic-productions-YT/releases" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-wide">Download for macOS / Linux</a>
+                        <a href="https://github.com/Lastic56/lastic-productions-YT" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-wide" style="margin-top:12px;">View Source on GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile Downloads -->
+    <section id="download-mobile" class="download-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Mobile App (Android)</h2>
+                <p>Install the APK on your Android phone and download straight to your Downloads folder.</p>
+            </div>
+            <div class="app-showcase reverse">
+                <div class="app-details">
+                    <div class="app-specs">
+                        <div class="spec-item">
+                            <span class="spec-label">Platform</span>
+                            <span class="spec-value">Android API 21+ (5.0+)</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Architecture</span>
+                            <span class="spec-value">arm64-v8a</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Framework</span>
+                            <span class="spec-value">Kivy 2.x + Buildozer</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Storage</span>
+                            <span class="spec-value">Saves to /Download/</span>
+                        </div>
+                    </div>
+                    <ul class="app-features">
+                        <li><span class="feature-check">✓</span> Dark mode mobile UI</li>
+                        <li><span class="feature-check">✓</span> Saves to phone Downloads folder</li>
+                        <li><span class="feature-check">✓</span> Background threading</li>
+                        <li><span class="feature-check">✓</span> Real-time progress bar &amp; ETA</li>
+                        <li><span class="feature-check">✓</span> MP3 / M4A / WAV audio extraction</li>
+                        <li><span class="feature-check">✓</span> Runtime storage permissions</li>
+                    </ul>
+                    <div class="app-actions">
+                        <a href="https://github.com/Lastic56/lastic-productions-YT/releases/download/v1.0.0/lasticproductions-1.0.0-arm64-v8a_armeabi-v7a-debug.apk" class="btn btn-primary btn-wide">Download APK (Android)</a>
+                        <a href="https://github.com/Lastic56/lastic-productions-YT/releases" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-wide" style="margin-top:12px;">View All Releases</a>
+                    </div>
+                </div>
+                <div class="app-image-placeholder">
+                    <img src="http://localhost:10028/wp-content/uploads/2026/10/Screenshot-2026-10-24-184919.png" alt="Mobile App Screenshot" class="app-image" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                        <div class="placeholder-content" style="display:none;">
+                            <span class="placeholder-icon">📱</span>
+                            <span class="placeholder-text">Mobile App</span>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Install Instructions -->
+    <section class="install-instructions">
+        <div class="container">
+            <div class="instructions-grid">
+                <div class="instruction-card">
+                    <div class="step-number">1</div>
+                    <h3>Choose your platform</h3>
+                    <p>Select PC or Mobile above to see the right download for your device.</p>
+                </div>
+                <div class="instruction-card">
+                    <div class="step-number">2</div>
+                    <h3>Download &amp; install</h3>
+                    <p>For PC: run the installer. For Android: enable "Install unknown apps" then open the APK.</p>
+                </div>
+                <div class="instruction-card">
+                    <div class="step-number">3</div>
+                    <h3>Start downloading</h3>
+                    <p>Paste any video link, pick your quality, and hit Download.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support -->
+    <section id="support" class="section support">
+        <div class="container">
+            <div class="coffee-card">
+                <div class="coffee-content">
+                    <span class="coffee-emoji">☕</span>
+                    <div class="coffee-text">
+                        <h3>Say thanks to the developer</h3>
+                        <p>Lastic Productions is free and open-source. If you find it useful, consider buying me a coffee to keep the project alive.</p>
+                    </div>
+                </div>
+                <div class="coffee-actions">
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-coffee">
+                        <span class="coffee-icon">☕</span> Buy Me a Coffee
+                    </a>
+                    <a href="https://github.com/Lastic56/lastic-productions-YT" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-coffee">
+                        ⭐ Star on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">LASTIC PRODUCTIONS</div>
+                <div class="footer-links">
+                    <a href="index.html#welcome">Welcome</a>
+                    <a href="index.html#tool">Enter Tool</a>
+                    <a href="index.html#about">About</a>
+                    <a href="index.html#support">Support</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Lastic Productions &bull; Studio Cyber &bull; MIT License</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Platform picker toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const platformBtns = document.querySelectorAll('.platform-btn');
+            const sections = document.querySelectorAll('.download-section');
+
+            platformBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const platform = btn.getAttribute('data-platform');
+
+                    // Update buttons
+                    platformBtns.forEach(b => {
+                        b.classList.remove('active');
+                        b.setAttribute('aria-pressed', 'false');
+                    });
+                    btn.classList.add('active');
+                    btn.setAttribute('aria-pressed', 'true');
+
+                    // Show/hide sections
+                    sections.forEach(section => {
+                        if (section.id === `download-${platform}`) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
