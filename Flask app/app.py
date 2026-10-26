@@ -442,6 +442,7 @@ def analyze():
 
     ydl_opts = build_ydl_opts(platform)
     info = None
+    last_err = ""
     try:
         print(f"Analyzing URL with yt-dlp: {url}")
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -451,6 +452,7 @@ def analyze():
     except Exception as e:
         print(f"Primary extraction failed: {e}")
         err_str = str(e)
+        last_err = err_str
         info = None
         # Only retry if it's not the internal unpack error, or if we haven't retried yet
         if "not enough values to unpack" not in err_str:
@@ -467,6 +469,7 @@ def analyze():
                     info = ydl.extract_info(url, download=False)
             except Exception as ge:
                 print(f"Fallback extraction failed: {ge}")
+                last_err = str(ge)
                 info = None
 
     # Last-resort retry for YouTube using IOS client which is more stable
@@ -489,6 +492,7 @@ def analyze():
                 info = ydl.extract_info(url, download=False)
         except Exception as e2:
             print(f"iOS retry failed: {e2}")
+            last_err = str(e2)
             info = None
     
     if info:
@@ -551,7 +555,12 @@ def analyze():
     elif platform == 'facebook':
         return jsonify({'error': f"Facebook: This video may be private or require login. Try a public reel/page URL."}), 500
     elif platform == 'youtube':
-        return jsonify({'error': f"YouTube: This video may be restricted or unavailable. Try updating yt-dlp or use a different video."}), 500
+        low = (last_err or "").lower()
+        if 'sign in' in low or 'not a bot' in low or 'confirm' in low or 'cookies' in low:
+            return jsonify({'error': "YouTube is blocking automated access (bot check). Fix: add a YouTube cookies.txt. On Render, add it as a Secret File named 'cookies.txt'. Then retry."}), 500
+        detail = (last_err or "").strip()
+        detail = detail[-200:] if detail else ""
+        return jsonify({'error': f"YouTube: could not extract this video. {detail}"}), 500
     elif platform == 'pornhub':
         return jsonify({'error': f"PornHub: Could not extract video. The video may be private or removed."}), 500
     elif platform in ['youporn', 'redtube', 'xvideos', 'xnxx', 'brazzers', 'xhamster', 'spankbang', 'tube8', 'youjizz']:
