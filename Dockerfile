@@ -1,7 +1,13 @@
 FROM python:3.11-slim
 
-# Install FFmpeg for audio conversion (MP3/M4A/WAV)
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+# FFmpeg for audio/video conversion + curl/gnupg for Node.js install
+RUN apt-get update && apt-get install -y ffmpeg curl ca-certificates gnupg && rm -rf /var/lib/apt/lists/*
+
+# Node.js is required by yt-dlp to solve YouTube's JS (n-sig) challenge,
+# otherwise only storyboard images are available for YouTube videos.
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

@@ -241,14 +241,13 @@ def build_ydl_opts(platform, extra_opts=None):
     if platform == 'youtube':
         opts['nocheckcertificate'] = True
         opts['ignoreerrors'] = 'download'
-        # Add YouTube-specific bypass options
+        # Do NOT skip 'js': yt-dlp must solve YouTube's n-sig challenge or only
+        # storyboard images are returned. Requires a JS runtime (Node) + EJS solver.
         opts['extractor_args'] = {
-            'youtube': {
-                'player_client': ['android', 'ios', 'web', 'android_music', 'android_vr'],
-                'player_skip': ['configs', 'webgl', 'js'],
-            },
             'generic': {'impersonate': ['chrome']},
         }
+        opts['js_runtimes'] = {'node': {}}
+        opts['remote_components'] = ['ejs:github']
     cookie_path = get_cookie_path()
     if os.path.exists(cookie_path):
         opts['cookiefile'] = cookie_path
