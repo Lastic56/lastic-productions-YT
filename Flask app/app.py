@@ -240,7 +240,7 @@ def build_ydl_opts(platform, extra_opts=None):
     }
     if platform == 'youtube':
         opts['nocheckcertificate'] = True
-        opts['ignoreerrors'] = 'download'
+        opts['ignoreerrors'] = False
         # Do NOT skip 'js': yt-dlp must solve YouTube's n-sig challenge or only
         # storyboard images are returned. Requires a JS runtime (Node) + EJS solver.
         opts['extractor_args'] = {
@@ -462,8 +462,12 @@ def analyze():
                     'socket_timeout': 60,
                     'retries': 5,
                     'nocheckcertificate': True,
-                    'ignoreerrors': True,
+                    'ignoreerrors': False,
+                    'js_runtimes': {'node': {}},
+                    'remote_components': ['ejs:github'],
                 }
+                if os.path.exists(get_cookie_path()):
+                    fallback_opts['cookiefile'] = get_cookie_path()
                 with yt_dlp.YoutubeDL(fallback_opts) as ydl:
                     info = ydl.extract_info(url, download=False)
             except Exception as ge:
@@ -480,13 +484,17 @@ def analyze():
                 'socket_timeout': 60,
                 'retries': 5,
                 'nocheckcertificate': True,
-                'ignoreerrors': True,
+                'ignoreerrors': False,
+                'js_runtimes': {'node': {}},
+                'remote_components': ['ejs:github'],
                 'extractor_args': {
                     'youtube': {
                         'player_client': ['ios'],
                     }
                 },
             }
+            if os.path.exists(get_cookie_path()):
+                ios_opts['cookiefile'] = get_cookie_path()
             with yt_dlp.YoutubeDL(ios_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
         except Exception as e2:
@@ -566,6 +574,41 @@ def analyze():
         return jsonify({'error': f"{platform.capitalize()}: Could not extract video. The video may be private, removed, or requires premium."}), 500
 
     return jsonify({'error': err_msg}), 500
+
+@app.route('/diag', methods=['GET'])
+def diag():
+    import subprocess
+    out = {
+        'commit': os.environ.get('RENDER_GIT_COMMIT', 'unknown'),
+        'cwd': os.getcwd(),
+        'cookie_path': get_cookie_path(),
+        'cookie_exists': os.path.exists(get_cookie_path()),
+    }
+    try:
+        out['cookie_size'] = os.path.getsize(get_cookie_path())
+        with open(get_cookie_path(), 'r', errors='ignore') as fh:
+            out['cookie_lines'] = sum(1 for _ in fh)
+    except Exception as e:
+        out['cookie_err'] = str(e)
+    for rt in ('node', 'deno', 'bun', 'qjs'):
+        try:
+            p = subprocess.run([rt, '--version'], capture_output=True, text=True, timeout=15)
+            out[rt] = (p.stdout or p.stderr or 'found').strip()[:80]
+        except Exception as e:
+            out[rt] = f'missing ({type(e).__name__})'
+    test_url = request.args.get('test')
+    if test_url:
+        try:
+            opts = build_ydl_opts('youtube')
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(test_url, download=False)
+            if not info:
+                out['test'] = 'None returned (no info)'
+            else:
+                out['test'] = 'OK: ' + str(info.get('title')) + ' | formats=' + str(len(info.get('formats') or []))
+        except Exception as e:
+            out['test'] = f'{type(e).__name__}: {str(e)[-400:]}'
+    return jsonify(out)
 
 @app.route('/search', methods=['POST'])
 def search_videos():
